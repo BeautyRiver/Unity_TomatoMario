@@ -1,80 +1,85 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.Intrinsics;
+using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.UI;
 #if UNITY_EDITOR
-[ExecuteInEditMode]  //<- ÀÌ ºÎºĞÀÌ ¿¡µğÅÍ¿¡¼­ ÀÛµ¿µÇµµ·Ï ¼±¾ğÇÏ´Â ºÎºĞ
+[ExecuteInEditMode]  //<- ì´ ë¶€ë¶„ì´ ì—ë””í„°ì—ì„œ ì‘ë™ë˜ë„ë¡ ì„ ì–¸í•˜ëŠ” ë¶€ë¶„
 #endif
 
 
 public class PlayerMove : MonoBehaviour
 {
-    // ÀÌº¥Æ®
-    public static event Action<float> OnPlayerJumped; // Á¡ÇÁ ÀÌº¥Æ®
-    public static event Action DownHoleEvent; //  È¦ ´Ù¿î ÀÌº¥Æ®
+    // ì´ë²¤íŠ¸
+    public static event Action<float> OnPlayerJumped; // ì í”„ ì´ë²¤íŠ¸
+    public static event Action DownHoleEvent; //  í™€ ë‹¤ìš´ ì´ë²¤íŠ¸
 
-    [Header("Ä«¸Ş¶ó ¹× °ÔÀÓ °ü¸®")]
+    [Header("ì¹´ë©”ë¼ ë° ê²Œì„ ê´€ë¦¬")]
     public Camera playerCamera;
     public GameManager gameManager;
 
-    [Header("¿Àµğ¿À")]
+    [Header("ì˜¤ë””ì˜¤")]
     public AudioClip audioJump;
     private AudioSource audioSource;
 
-    [Header("ÇÃ·¹ÀÌ¾î ¼Ó¼º")]
-    [SerializeField] private float maxSpeed = 5.0f; // ÃÖ´ë ÀÌµ¿ ¼Óµµ
-    [SerializeField] private float moveSpeed = 3.0f; // ÀÌµ¿ ¼Óµµ
+    [Header("í”Œë ˆì´ì–´ ì†ì„±")]
+    [SerializeField] private float maxSpeed = 5.0f; // ìµœëŒ€ ì´ë™ ì†ë„
+    [SerializeField] private float moveSpeed = 3.0f; // ì´ë™ ì†ë„
 
-    [SerializeField] private float jumpPower; // ÇöÀç Á¡ÇÁ Èû
-    private float minJumpPower = 6f; // ÃÖ¼Ò Á¡ÇÁ Èû
-    private float maxJumpPower = 12f; // ÃÖ´ë Á¡ÇÁ Èû
-    public float attackJumpPower; // Á¡ÇÁ ÈÄ ¼öÁ÷¹İµ¿
-    private float jumpDelay = 0.5f; // Á¡ÇÁ µô·¹ÀÌ
-    private float lastJumpTime; // ¸¶Áö¸· Á¡ÇÁ ½Ã°£
+    [SerializeField] private float jumpPower; // í˜„ì¬ ì í”„ í˜
+    public float minJumpPower = 9f; // ìµœì†Œ ì í”„ í˜
+    public float maxJumpPower = 12f; // ìµœëŒ€ ì í”„ í˜
+    public float attackJumpPower; // ì í”„ í›„ ìˆ˜ì§ë°˜ë™
+    private float jumpDelay = 0.5f; // ì í”„ ë”œë ˆì´
+    private float lastJumpTime; // ë§ˆì§€ë§‰ ì í”„ ì‹œê°„
 
-    public int life = 3; // »ı¸í
+    public int life = 3; // ìƒëª…
 
-    [HideInInspector] public Vector3 initialScale; // ÃÊ±â ½ºÄÉÀÏ °ª
-    public Vector2 initPos; // ÃÊ±â À§Ä¡
+    [HideInInspector] public Vector3 initialScale; // ì´ˆê¸° ìŠ¤ì¼€ì¼ ê°’
+    public Vector2 initPos; // ì´ˆê¸° ìœ„ì¹˜
 
-    public float moveDir; // ÀÌµ¿ ¹æÇâ
+    public float moveDir; // ì´ë™ ë°©í–¥
 
     [Header("UI")]
-    public Slider jumpBar; // Á¡ÇÁ ÆÄ¿ö ¹Ù
+    public Slider jumpBar; // ì í”„ íŒŒì›Œ ë°”
 
-    [Header("À§Ä¡ °íÁ¤")]
-    Vector2 fixPos = Vector2.zero; // °íÁ¤µÉ À§Ä¡
-    private bool isFixPos = false; // À§Ä¡ °íÁ¤ ¿©ºÎ
+    [Header("ìœ„ì¹˜ ê³ ì •")]
+    Vector2 fixPos = Vector2.zero; // ê³ ì •ë  ìœ„ì¹˜
+    private bool isFixPos = false; // ìœ„ì¹˜ ê³ ì • ì—¬ë¶€
 
 
-    [Header("·¹ÀÌ¾î ¸¶½ºÅ©")]
-    public LayerMask platFormLayer; // ÇÃ·§Æû ·¹ÀÌ¾î
-    public LayerMask enemyHitBoxLayer; // Àû ·¹ÀÌ¾î
+    [Header("ë ˆì´ì–´ ë§ˆìŠ¤í¬")]
+    public LayerMask platFormLayer; // í”Œë«í¼ ë ˆì´ì–´
+    public LayerMask enemyHitBoxLayer; // ì  ë ˆì´ì–´
 
-    [Header("»óÅÂ °Ë»ç")]
-    private bool isChange = false; // Ä³¸¯ÅÍ¸¦ º¯°æÇÏ¿´´ÂÁö (»õ Ä³¸¯ÅÍ)
-    public bool isGrounded = false; // ¶¥¿¡ ´ê¾Ò´ÂÁö ¿©ºÎ
-    public bool canKillEnemy = false; // ÀûÀ» Á×ÀÏ ¼ö ÀÖ´ÂÁö ¿©ºÎ
-    public bool isMuscle = false; // ±ÙÀ° »óÅÂ ¿©ºÎ
-    public bool moveOk = true; // ÀÌµ¿ °¡´É ¿©ºÎ
-    public bool isDead = false; // »ç¸Á »óÅÂ
-    public bool isDownKey = false; // ¾Æ·¡Å° ÀÔ·Â »óÅÂ
-    [HideInInspector] public bool isRbOnRunning = false; // Áß·Â ÄÚ·çÆ¾ ½ÇÇà ¿©ºÎ
+    [Header("ìƒíƒœ ê²€ì‚¬")]
+    private bool isChange = false; // ìºë¦­í„°ë¥¼ ë³€ê²½í•˜ì˜€ëŠ”ì§€ (ìƒˆ ìºë¦­í„°)
+    public bool isGrounded = false; // ë•…ì— ë‹¿ì•˜ëŠ”ì§€ ì—¬ë¶€
+    public bool canKillEnemy = false; // ì ì„ ì£½ì¼ ìˆ˜ ìˆëŠ”ì§€ ì—¬ë¶€
+    public bool isMuscle = false; // ê·¼ìœ¡ ìƒíƒœ ì—¬ë¶€
+    public bool moveOk = true; // ì´ë™ ê°€ëŠ¥ ì—¬ë¶€
+    public bool isDead = false; // ì‚¬ë§ ìƒíƒœ
+    public bool isDownKey = false; // ì•„ë˜í‚¤ ì…ë ¥ ìƒíƒœ
+    [HideInInspector] public bool isRbOnRunning = false; // ì¤‘ë ¥ ì½”ë£¨í‹´ ì‹¤í–‰ ì—¬ë¶€
 
-    [Header("ÄÄÆ÷³ÍÆ®")]
+    [Header("ì»´í¬ë„ŒíŠ¸")]
     [HideInInspector] public Rigidbody2D rigid;
     private SpriteRenderer spriteRenderer;
     private Animator animator;
-    private BoxCollider2D boxCollider2D; // ¹Ú½º Äİ¶óÀÌ´õ
-    public RuntimeAnimatorController playerAnimatorController; // ÇÃ·¹ÀÌ¾î ¾Ö´Ï¸ŞÀÌÅÍ
-    public RuntimeAnimatorController muscleAnimatorController; // ±ÙÀ° »óÅÂ ¾Ö´Ï¸ŞÀÌÅÍ ÄÁÆ®·Ñ·¯
-    public RuntimeAnimatorController birdAnimatorController; // »õ ¾Ö´Ï¸ŞÀÌÅÍ *º¯½Å
+    private BoxCollider2D boxCollider2D; // ë°•ìŠ¤ ì½œë¼ì´ë”
+    public RuntimeAnimatorController playerAnimatorController; // í”Œë ˆì´ì–´ ì• ë‹ˆë©”ì´í„°
+    public RuntimeAnimatorController muscleAnimatorController; // ê·¼ìœ¡ ìƒíƒœ ì• ë‹ˆë©”ì´í„° ì»¨íŠ¸ë¡¤ëŸ¬
+    public RuntimeAnimatorController birdAnimatorController; // ìƒˆ ì• ë‹ˆë©”ì´í„° *ë³€ì‹ 
 
-    [Header("°¨Áö ¼¾¼­ Å©±â")]
+    [Header("ê°ì§€ ì„¼ì„œ í¬ê¸°")]
     [SerializeField] private Vector2 groundCheckBoxSize = new Vector2(0.43f, 0.18f);
     [SerializeField] private Vector2 enemyCheckBoxSize = new Vector2(1f, 0.5f);
-    [SerializeField] private Vector2 footPostion; // ¹ß À§Ä¡
+    [SerializeField] private Vector2 footPosition; // ë°œ ìœ„ì¹˜
+    [SerializeField] private float refVelocity;
+    [SerializeField] private float slideRate;
+
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -83,7 +88,7 @@ public class PlayerMove : MonoBehaviour
         boxCollider2D = GetComponent<BoxCollider2D>();
         audioSource = GetComponent<AudioSource>();
 
-        // ÃÊ±â ¼³Á¤
+        // ì´ˆê¸° ì„¤ì •
         jumpPower = minJumpPower;
         jumpBar.value = minJumpPower;
         initialScale = transform.localScale;
@@ -95,23 +100,24 @@ public class PlayerMove : MonoBehaviour
 
         transform.position = new Vector3(x, y, z);
 
-        life = PlayerPrefs.GetInt("PlayerLife", 3); // PlayerPrefs¿¡¼­ life °ªÀ» ºÒ·¯¿À±â 
+        life = PlayerPrefs.GetInt("PlayerLife", 3); // PlayerPrefsì—ì„œ life ê°’ì„ ë¶ˆëŸ¬ì˜¤ê¸° 
         isDead = false;
     }
 
     void Update()
     {
-        //MoveOk°¡ trueÀÏ¶§¸¸
+        //MoveOkê°€ trueì¼ë•Œë§Œ
         if (moveOk && isChange == false)
         {
-            // ¹æÇâÀüÈ¯ ¹× ÀÌµ¿
+            // ë°©í–¥ì „í™˜ ë° ì´ë™
             moveDir = Input.GetAxisRaw("Horizontal");
-
+            
             if (moveDir != 0)
             {
-                spriteRenderer.flipX = moveDir == -1;
+                float newScaleX = Mathf.Sign(moveDir) * Mathf.Abs(transform.localScale.x); // Signì€ ë¶€í˜¸ë¥¼ ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜ (ì–‘ìˆ˜ë©´ 1, ìŒìˆ˜ë©´ -1 0ì´ë©´ 0)
+                transform.localScale = new Vector3(newScaleX, transform.localScale.y, transform.localScale.z); // ë°©í–¥ì „í™˜
             }
-            // ¾Ö´Ï¸ŞÀÌ¼Ç
+            // ì• ë‹ˆë©”ì´ì…˜
             animator.SetBool("isWalking", moveDir != 0);
 
             bool isFalling = rigid.velocity.y < 0.01f;
@@ -120,14 +126,14 @@ public class PlayerMove : MonoBehaviour
                 animator.SetBool("isJumping", !isGrounded);
             }
 
-            #region Å° ´Ù¿î Ã¼Å©            
-            // Ä³¸¯ÅÍ ÀüÈ¯
-            if (Input.GetKeyDown(KeyCode.Tab)) // ÅÇÀ» ´©¸£°í, ¾ÆÁ÷ º¯°æ(»õ)°¡ ¾ÈµÈ »óÅÂÀÌ¸é
+            #region í‚¤ ë‹¤ìš´ ì²´í¬            
+            // ìºë¦­í„° ì „í™˜
+            if (Input.GetKeyDown(KeyCode.Tab)) // íƒ­ì„ ëˆ„ë¥´ê³ , ì•„ì§ ë³€ê²½(ìƒˆ)ê°€ ì•ˆëœ ìƒíƒœì´ë©´
             {
                 rigid.velocity = Vector3.zero;
                 if (isChange == false)
                 {
-                    isChange = true; // º¯½Å ¿Ï·á
+                    isChange = true; // ë³€ì‹  ì™„ë£Œ
                     animator.runtimeAnimatorController = birdAnimatorController;
                 }
                 else if (isChange == true)
@@ -136,7 +142,7 @@ public class PlayerMove : MonoBehaviour
                     animator.runtimeAnimatorController = playerAnimatorController;
                 }
             }
-            // Á¡ÇÁ
+            // ì í”„
             if (Input.GetButtonUp("Jump"))
             {
                 if (!animator.GetBool("isJumping") && isGrounded && Time.time > lastJumpTime + jumpDelay)
@@ -148,13 +154,13 @@ public class PlayerMove : MonoBehaviour
                     gameManager.SoundOn("jump");
                     lastJumpTime = Time.time;
 
-                    // ÀÌº¥Æ® È£Ãâ
+                    // ì´ë²¤íŠ¸ í˜¸ì¶œ
                     OnPlayerJumped?.Invoke(jumpPower);
                 }
                 jumpPower = minJumpPower;
             }
 
-            // Á¡ÇÁ ÆÄ¿ö Â÷Â¡
+            // ì í”„ íŒŒì›Œ ì°¨ì§•
             if (Input.GetButton("Jump"))
             {
                 if (jumpPower <= maxJumpPower)
@@ -163,7 +169,7 @@ public class PlayerMove : MonoBehaviour
                 }
             }
 
-            // DownKey¸¦ ´­·¶´ÂÁö ¿©ºÎ
+            // DownKeyë¥¼ ëˆŒë €ëŠ”ì§€ ì—¬ë¶€
             isDownKey = Input.GetKey(KeyCode.DownArrow) ? true : false;
 
             #endregion
@@ -171,13 +177,13 @@ public class PlayerMove : MonoBehaviour
             if (transform.position.y < -7.5f && !(gameObject.layer == LayerMask.NameToLayer("PlayerDie")))
                 OnDie();
 
-            // Ä«¸Ş¶óÀÇ ¿ŞÂÊÀÌ»óÀ¸·Î ÀÌµ¿¸øÇÏ°Ô
+            // ì¹´ë©”ë¼ì˜ ì™¼ìª½ì´ìƒìœ¼ë¡œ ì´ë™ëª»í•˜ê²Œ
             // CanMovePos();
 
             jumpBar.value = jumpPower;
         }
         
-        // »õ·Î Ä³¸¯ÅÍ°¡ ¹Ù²î¾úÀ»¶§
+        // ìƒˆë¡œ ìºë¦­í„°ê°€ ë°”ë€Œì—ˆì„ë•Œ
         if (moveOk && isChange == true)
         {
             if(Input.GetKey(KeyCode.UpArrow))
@@ -186,29 +192,28 @@ public class PlayerMove : MonoBehaviour
             }
         }
         
+        // ë°”ë‹¥ ì¶©ëŒ ì²´í¬
+        CheckGroundAndEnemy();
+        GroundFriction();
+
     }
     void FixedUpdate()
-    {
-        // ¹Ù´Ú Ãæµ¹ Ã¼Å©
-        CheckGroundAndEnemy();
-
+    {        
         if (moveOk && isChange == false)
         {
-            rigid.AddForce(new Vector2(moveDir * moveSpeed, 0));
+            rigid.AddForce(new Vector2(moveDir * moveSpeed, 0),ForceMode2D.Force);
             if (Mathf.Abs(rigid.velocity.x) > maxSpeed)
             {
-                // rigid.velocity.y´Â ±×´ë·Î À¯ÁöÇÏ¸é¼­ xÃà ¼Óµµ¸¸ Á¶Á¤
+                // rigid.velocity.yëŠ” ê·¸ëŒ€ë¡œ ìœ ì§€í•˜ë©´ì„œ xì¶• ì†ë„ë§Œ ì¡°ì •
                 rigid.velocity = new Vector2(Mathf.Sign(rigid.velocity.x) * maxSpeed, rigid.velocity.y);
             }
 
             if (rigid.velocity.y > maxJumpPower)
-                rigid.velocity = new Vector2(rigid.velocity.x, maxJumpPower);
-
-            
+                rigid.velocity = new Vector2(rigid.velocity.x, maxJumpPower);            
         }
     }
 
-    // Ä«¸Ş¶óÀÇ ¿ŞÂÊÀÌ»óÀ¸·Î ÀÌµ¿¸øÇÏ°Ô
+    // ì¹´ë©”ë¼ì˜ ì™¼ìª½ì´ìƒìœ¼ë¡œ ì´ë™ëª»í•˜ê²Œ
     private void CanMovePos()
     {
         Vector3 screenPoint = playerCamera.WorldToViewportPoint(transform.position);
@@ -220,47 +225,30 @@ public class PlayerMove : MonoBehaviour
     }
 
 
-    // ³«ÇÏ½ÃÅ°±â
-    public IEnumerator RigidbodyOn(Collision2D cs, float time)
-    {
-        isRbOnRunning = true;
-
-        yield return new WaitForSeconds(time);
-        if (cs.rigidbody != null) // ¿©±â¿¡¼­µµ null Ã¼Å©¸¦ ÇØ¾ß ¾ÈÀü
-        {
-            cs.rigidbody.isKinematic = false;
-            SavePoint savePoint = FindObjectOfType<SavePoint>();
-            if (savePoint != null)
-                savePoint.SavePointRbOn();
-        }
-
-        isRbOnRunning = false;
-    }
-
-    //¸ó½ºÅÍ °ø°İÇÒ¶§
+    //ëª¬ìŠ¤í„° ê³µê²©í• ë•Œ
     public void OnAttack(GameObject enemy)
     {
-        //Àû »ç¸Á
+        //ì  ì‚¬ë§
         Enemy monster = enemy.GetComponentInParent<Enemy>();
         monster.gameObject.tag = "DeadEnemy";
         monster.OnEnemyDie();     
 
-        //¹â¾ÒÀ»¶§ À§·Î Á¡ÇÁµÇ±â
+        //ë°Ÿì•˜ì„ë•Œ ìœ„ë¡œ ì í”„ë˜ê¸°
         rigid.velocity = new Vector2(rigid.velocity.x, 0);
         rigid.AddForce(Vector2.up * attackJumpPower, ForceMode2D.Impulse);
 
 
-        //Á¡¼öÁõ°¡
+        //ì ìˆ˜ì¦ê°€
         gameManager.stagePoint += 100;
 
     }
 
-    //Player »ç¸Á
+    //Player ì‚¬ë§
     public void OnDie()
     {
         if (!isDead)
         {
-            //Sprite Äİ¶óÀÌ´õ ²ô±â
+            //Sprite ì½œë¼ì´ë” ë„ê¸°
             boxCollider2D.enabled = false;
 
             EnabledHeadSensor(false);
@@ -270,7 +258,7 @@ public class PlayerMove : MonoBehaviour
             moveOk = false;
             gameObject.layer = LayerMask.NameToLayer("PlayerDie");
             life--;
-            PlayerPrefs.SetInt("PlayerLife", life); // life °ªÀ» PlayerPrefs¿¡ ÀúÀåÇÕ´Ï´Ù.
+            PlayerPrefs.SetInt("PlayerLife", life); // life ê°’ì„ PlayerPrefsì— ì €ì¥í•©ë‹ˆë‹¤.
             PlayerPrefs.Save();
             gameManager.SoundOn("death");
 
@@ -278,7 +266,7 @@ public class PlayerMove : MonoBehaviour
         }
 
     }
-    //Á×À»¶§ ¸¶¸®¿ÀÃ³·³ Á×°ÔÇÏ´Â ¸ğ¼Ç ÄÚ·çÆ¾
+    //ì£½ì„ë•Œ ë§ˆë¦¬ì˜¤ì²˜ëŸ¼ ì£½ê²Œí•˜ëŠ” ëª¨ì…˜ ì½”ë£¨í‹´
     IEnumerator DieMotion()
     {
         float speed = 8;
@@ -289,30 +277,32 @@ public class PlayerMove : MonoBehaviour
         rigid.AddForce(Vector2.up * speed, ForceMode2D.Impulse);
         yield return new WaitForSeconds(0.7f);
         rigid.gravityScale = 8;
-        //Sprite »èÁ¦
+        //Sprite ì‚­ì œ
         StartCoroutine(DeActive(1));
     }
 
-    // ÇÃ·¹ÀÌ¾î ºñÈ°¼ºÈ­
+    // í”Œë ˆì´ì–´ ë¹„í™œì„±í™”
     IEnumerator DeActive(float time)
     {
         yield return new WaitForSeconds(time);
         //gameObject.SetActive(false);
-        gameManager.DeathSceneOn(); // µ¥¾²¾À Å°±â
+        gameManager.DeathSceneOn(); // ë°ì“°ì”¬ í‚¤ê¸°
     }
 
-    // ¸ó½ºÅÍ °ø°İ, ¶¥ Ã¼Å© È®ÀÎ
+    // ëª¬ìŠ¤í„° ê³µê²©, ë•… ì²´í¬ í™•ì¸
     private void CheckGroundAndEnemy()
     {
         Bounds bounds = boxCollider2D.bounds;
-        footPostion = new Vector2(bounds.center.x, bounds.min.y);
-        canKillEnemy = Physics2D.OverlapBox(footPostion, enemyCheckBoxSize, 0, enemyHitBoxLayer); // ¹ß ¹Ø¿¡ ÀûÀÇ ¸Ó¸®°¡ ÀÖÀ¸¸é Á×ÀÏ ¼ö ÀÖÀ½
-        isGrounded = Physics2D.OverlapBox(footPostion, groundCheckBoxSize, 0, platFormLayer);
+        footPosition = new Vector2(bounds.center.x, bounds.min.y);
+        canKillEnemy = Physics2D.OverlapBox(footPosition, enemyCheckBoxSize, 0, enemyHitBoxLayer); // ë°œ ë°‘ì— ì ì˜ ë¨¸ë¦¬ê°€ ìˆìœ¼ë©´ ì£½ì¼ ìˆ˜ ìˆìŒ
+        //isGrounded = Physics2D.OverlapBox(footPosition, groundCheckBoxSize, 0, platFormLayer);
 
-        EnabledHeadSensor(!isGrounded); // Á¡ÇÁÇÒ¶§¸¸ ¸Ó¸® ¼¾¼­ Å°±â
+        isGrounded = Physics2D.BoxCast(footPosition, groundCheckBoxSize , 0, Vector2.down,0.01f, platFormLayer) ?  true : false;
+        canKillEnemy = Physics2D.BoxCast(footPosition, enemyCheckBoxSize, 0, Vector2.down, 0.01f, enemyHitBoxLayer) ? true : false;        
+        EnabledHeadSensor(!isGrounded); // ì í”„í• ë•Œë§Œ ë¨¸ë¦¬ ì„¼ì„œ í‚¤ê¸°
     }
 
-    // Åä°ü¿¡ µé¾î°¥¶§
+    // í† ê´€ì— ë“¤ì–´ê°ˆë•Œ
     public void InGreenHole(Vector2 pos)
     {
         boxCollider2D.enabled = false;
@@ -325,7 +315,7 @@ public class PlayerMove : MonoBehaviour
         StartCoroutine(GreenHoleMoveDown());
     }
 
-    // Åä°ü µé¾î°¡´Â ¸ğ¼Ç
+    // í† ê´€ ë“¤ì–´ê°€ëŠ” ëª¨ì…˜
     IEnumerator GreenHoleMoveDown()
     {
         float moveTime = 0;
@@ -340,10 +330,10 @@ public class PlayerMove : MonoBehaviour
         OnDie();
     }
 
-    // ¸Ó¸® ¼¾¼­²ô±â
+    // ë¨¸ë¦¬ ì„¼ì„œë„ê¸°
     public void EnabledHeadSensor(bool enable)
     {
-        // ¸ğµç ÀÚ½Ä ¿ÀºêÁ§Æ®µé Áß¿¡¼­ 'HeadSensor' ÅÂ±×¸¦ °¡Áø ¿ÀºêÁ§Æ®¸¦ Ã£À½
+        // ëª¨ë“  ìì‹ ì˜¤ë¸Œì íŠ¸ë“¤ ì¤‘ì—ì„œ 'HeadSensor' íƒœê·¸ë¥¼ ê°€ì§„ ì˜¤ë¸Œì íŠ¸ë¥¼ ì°¾ìŒ
         foreach (Transform child in transform)
         {
             if (child.CompareTag("Player_Head"))
@@ -355,19 +345,36 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
-    #region µğ¹ö±×
-    // ±âÁî¸ğ ±×¸®±â
+    void GroundFriction()
+    {
+        if (isGrounded)
+        {
+            if(Mathf.Abs(moveDir) <= 0.01f)
+                rigid.velocity = new Vector2 (Mathf.SmoothDamp(rigid.velocity.x, 0f, ref refVelocity, slideRate), rigid.velocity.y);
+        }
+    }
+
+    #region ë””ë²„ê·¸
+    // ê¸°ì¦ˆëª¨ ê·¸ë¦¬ê¸°
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         if (boxCollider2D != null)
         {
             Gizmos.color = Color.red;
-            Bounds bounds = boxCollider2D.bounds;
-            Vector2 footPosition = new Vector2(bounds.center.x, bounds.min.y);
             Gizmos.DrawWireCube(footPosition, groundCheckBoxSize);
             Gizmos.color = Color.blue;
             Gizmos.DrawWireCube(footPosition, enemyCheckBoxSize);
+
+        }
+
+        if (isGrounded)
+        {
+            Debug.Log("ë•…ì— ë‹¿ìŒ");
+        }
+        if (canKillEnemy)
+        {
+            Debug.Log("ì ì„ ì£½ì¼ ìˆ˜ ìˆìŒ");
         }
     }
 #endif

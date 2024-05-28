@@ -40,12 +40,12 @@ public class Mushroom : Enemy
         Gizmos.DrawSphere(wallCheck[1].position, 0.01f);
         Gizmos.DrawRay(new Vector2(transform.position.x, transform.position.y + 0.1f), -transform.localScale.x * transform.right * 1f);
 
-        if (Physics2D.OverlapCircle(wallCheck[0].position, 0.01f, layerMask))
-            Debug.Log("0번 감지");
-        if (Physics2D.OverlapCircle(wallCheck[1].position, 0.01f, layerMask))
-            Debug.Log("1번 감지");
-        if (Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y + 0.1f), -transform.localScale.x * transform.right, 1f, layerMask))
-            Debug.Log("레이캐스트 감지");
+        // if (Physics2D.OverlapCircle(wallCheck[0].position, 0.01f, layerMask))
+        //     Debug.Log("0번 감지");
+        // if (Physics2D.OverlapCircle(wallCheck[1].position, 0.01f, layerMask))
+        //     Debug.Log("1번 감지");
+        // if (Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y + 0.1f), -transform.localScale.x * transform.right, 1f, layerMask))
+        //     Debug.Log("레이캐스트 감지");
     }
 
     /*protected void OnTriggerEnter2D ( Collider2D collision )

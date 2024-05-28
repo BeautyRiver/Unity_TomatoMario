@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    public Transform player; // ÇÃ·¹ÀÌ¾îÀÇ Transform
-    private float minX; // Ä«¸Ş¶ó°¡ ÀÌµ¿ÇÒ ¼ö ÀÖ´Â ÃÖ¼Ò X °ª
-    public float smoothTime = 0.5F; // Ä«¸Ş¶ó°¡ µû¶óÀâÀ» ¶§±îÁöÀÇ ´ë·«ÀûÀÎ ½Ã°£
-    private Vector3 velocity = Vector3.zero; // ³»ºÎÀûÀ¸·Î »ç¿ëµÉ ¼Óµµ ÂüÁ¶ º¯¼ö
+    public Transform player; // í”Œë ˆì´ì–´ì˜ Transform
+    private float minX; // ì¹´ë©”ë¼ê°€ ì´ë™í•  ìˆ˜ ìˆëŠ” ìµœì†Œ X ê°’
+    public float smoothTime = 0.5F; // ì¹´ë©”ë¼ê°€ ë”°ë¼ì¡ì„ ë•Œê¹Œì§€ì˜ ëŒ€ëµì ì¸ ì‹œê°„
+    private Vector3 velocity = Vector3.zero; // ë‚´ë¶€ì ìœ¼ë¡œ ì‚¬ìš©ë  ì†ë„ ì°¸ì¡° ë³€ìˆ˜
 
     private void Start()
     {
-        // ÃÊ±â minX °ªÀ» ÇöÀç Ä«¸Ş¶óÀÇ X À§Ä¡·Î ¼³Á¤
+        // ì´ˆê¸° minX ê°’ì„ í˜„ì¬ ì¹´ë©”ë¼ì˜ X ìœ„ì¹˜ë¡œ ì„¤ì •
         minX = transform.position.x;
     }
 
@@ -19,7 +19,7 @@ public class CameraFollow : MonoBehaviour
     {
         if (player != null)
         {
-            // ÇÃ·¹ÀÌ¾î°¡ minXº¸´Ù ¿À¸¥ÂÊ¿¡ ÀÖÀ» °æ¿ì¸¸ minX ¾÷µ¥ÀÌÆ®
+            // í”Œë ˆì´ì–´ê°€ minXë³´ë‹¤ ì˜¤ë¥¸ìª½ì— ìˆì„ ê²½ìš°ë§Œ minX ì—…ë°ì´íŠ¸
             if (player.position.x > minX)
             {
                 minX = player.position.x;
@@ -27,7 +27,7 @@ public class CameraFollow : MonoBehaviour
 
             Vector3 targetPosition = new Vector3(minX, transform.position.y, transform.position.z);
 
-            // ÇöÀç À§Ä¡¿¡¼­ ¸ñÇ¥ À§Ä¡(targetPosition)·Î ºÎµå·´°Ô ÀÌµ¿
+            // í˜„ì¬ ìœ„ì¹˜ì—ì„œ ëª©í‘œ ìœ„ì¹˜(targetPosition)ë¡œ ë¶€ë“œëŸ½ê²Œ ì´ë™
             transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
         }
     }

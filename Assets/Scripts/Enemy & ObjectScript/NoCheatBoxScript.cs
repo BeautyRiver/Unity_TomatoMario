@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.LowLevel;
 #if UNITY_EDITOR
-[ExecuteInEditMode]  //<- ÀÌ ºÎºĞÀÌ ¿¡µğÅÍ¿¡¼­ ÀÛµ¿µÇµµ·Ï ¼±¾ğÇÏ´Â ºÎºĞ
+[ExecuteInEditMode]  //<- ì´ ë¶€ë¶„ì´ ì—ë””í„°ì—ì„œ ì‘ë™ë˜ë„ë¡ ì„ ì–¸í•˜ëŠ” ë¶€ë¶„
 #endif
 
 
 public class NoCheatBoxScript : MonoBehaviour
 {
-    public GameObject[] Items; // ¹Ú½º¿¡¼­ µîÀåÇÒ ¾ÆÀÌÅÛ ¸ñ·Ï
-    public Sprite brokenBoxImg; // ºÎ¼­Áø ¹Ú½º ÀÌ¹ÌÁö
+    public GameObject[] Items; // ë°•ìŠ¤ì—ì„œ ë“±ì¥í•  ì•„ì´í…œ ëª©ë¡
+    public Sprite brokenBoxImg; // ë¶€ì„œì§„ ë°•ìŠ¤ ì´ë¯¸ì§€
 
-    private bool isOnBroken = false; // ¹Ú½º ºÎ¼­Á³´ÂÁö ¿©ºÎ
-    private int randomIndex; // ·£´ıÇÏ°Ô µîÀåÇÒ ¾ÆÀÌÅÛ ¹øÈ£
-    private bool isDetectedSensor = false; // ¼¾¼­¿¡ °¨ÁöµÆ´ÂÁö ¿©ºÎ
-    public Vector2 sensorBoxSize = new Vector2(1f, 0.5f); // ¼¾¼­°¨Áö Å©±â
+    private bool isOnBroken = false; // ë°•ìŠ¤ ë¶€ì„œì¡ŒëŠ”ì§€ ì—¬ë¶€
+    private int randomIndex; // ëœë¤í•˜ê²Œ ë“±ì¥í•  ì•„ì´í…œ ë²ˆí˜¸
+    private bool isDetectedSensor = false; // ì„¼ì„œì— ê°ì§€ëëŠ”ì§€ ì—¬ë¶€
+    public Vector2 sensorBoxSize = new Vector2(1f, 0.5f); // ì„¼ì„œê°ì§€ í¬ê¸°
     public float controlYLength;
-    public LayerMask playerHeadLayer; // ÇÃ·¹ÀÌ¾î ·¹ÀÌ¾î
-    [Header("ÄÄÆ÷³ÍÆ®")]
+    public LayerMask playerHeadLayer; // í”Œë ˆì´ì–´ ë ˆì´ì–´
+    [Header("ì»´í¬ë„ŒíŠ¸")]
     private BoxCollider2D boxCollider2D;
     private GameObject spawnedObject;
     private SpriteRenderer spr;
@@ -30,27 +30,27 @@ public class NoCheatBoxScript : MonoBehaviour
 
     private void Update()
     {
-        // Ä¡Æ®¼¾¼­ °¨Áö
-        if (SensorDetectionCheck() == true && !isOnBroken) // ÇÃ·¹ÀÌ¾î°¡ °¨ÁöµÇ°í ºÎ¼­Áø »óÅÂ°¡ ¾Æ´Ï¶ó¸é
+        // ì¹˜íŠ¸ì„¼ì„œ ê°ì§€
+        if (SensorDetectionCheck() == true && !isOnBroken) // í”Œë ˆì´ì–´ê°€ ê°ì§€ë˜ê³  ë¶€ì„œì§„ ìƒíƒœê°€ ì•„ë‹ˆë¼ë©´
         {
-            isOnBroken = true; // ¹Ú½º ºÎ¼­Áü(±İ°¨)
-            spr.sprite = brokenBoxImg; // ¹Ú½º¸¦ ºÎ¼­Áø ÀÌ¹ÌÁö·Î
-            // Items ¹è¿­ÀÌ ºñ¾îÀÖÁö ¾ÊÀº °æ¿ì¿¡¸¸ Ã³¸®
+            isOnBroken = true; // ë°•ìŠ¤ ë¶€ì„œì§(ê¸ˆê°)
+            spr.sprite = brokenBoxImg; // ë°•ìŠ¤ë¥¼ ë¶€ì„œì§„ ì´ë¯¸ì§€ë¡œ
+            // Items ë°°ì—´ì´ ë¹„ì–´ìˆì§€ ì•Šì€ ê²½ìš°ì—ë§Œ ì²˜ë¦¬
             if (Items != null)
             {
                 randomIndex = Random.Range(0, Items.Length);
                 GameObject selectedObject = Items[randomIndex];
-                // »ı¼ºµÈ ¿ÀºêÁ§Æ®¿¡ ´ëÇÑ ÂüÁ¶¸¦ ÀúÀå
+                // ìƒì„±ëœ ì˜¤ë¸Œì íŠ¸ì— ëŒ€í•œ ì°¸ì¡°ë¥¼ ì €ì¥
                 spawnedObject = Instantiate(selectedObject, transform.position, Quaternion.identity);
 
-                // »ı¼ºµÈ ¿ÀºêÁ§Æ®¿¡ ¿òÁ÷ÀÓ ÄÚ·çÆ¾À» ½ÃÀÛ
+                // ìƒì„±ëœ ì˜¤ë¸Œì íŠ¸ì— ì›€ì§ì„ ì½”ë£¨í‹´ì„ ì‹œì‘
                 StartCoroutine(MoveObjectUp(spawnedObject));
             }
         }
             
     }
    
-    // ¼¾¼­·Î °¨Áö (ÇÃ·¹ÀÌ¾î °¨Áö)
+    // ì„¼ì„œë¡œ ê°ì§€ (í”Œë ˆì´ì–´ ê°ì§€)
     private bool SensorDetectionCheck()
     {
         Bounds bounds = boxCollider2D.bounds;
@@ -60,10 +60,10 @@ public class NoCheatBoxScript : MonoBehaviour
         return isDetectedSensor;
     }
 
-    // ¿ÀºêÁ§Æ®¸¦ ÃµÃµÈ÷ À§·Î ÀÌµ¿½ÃÅ°´Â ÄÚ·çÆ¾
+    // ì˜¤ë¸Œì íŠ¸ë¥¼ ì²œì²œíˆ ìœ„ë¡œ ì´ë™ì‹œí‚¤ëŠ” ì½”ë£¨í‹´
     IEnumerator MoveObjectUp(GameObject obj)
     {
-        // ½ºÅ©¸³Æ®¸¦ ÀÏ½ÃÀûÀ¸·Î ºñÈ°¼ºÈ­
+        // ìŠ¤í¬ë¦½íŠ¸ë¥¼ ì¼ì‹œì ìœ¼ë¡œ ë¹„í™œì„±í™”
         MonoBehaviour[] scripts = obj.GetComponents<MonoBehaviour>();
 
         foreach (var script in scripts)
@@ -74,9 +74,9 @@ public class NoCheatBoxScript : MonoBehaviour
         obj.GetComponent<Collider2D>().enabled = false;
         obj.GetComponent<Rigidbody2D>().isKinematic = true;
 
-        // ¿òÁ÷ÀÓ Ã³¸®
-        float duration = 1.3f; // ¿òÁ÷ÀÓ Áö¼Ó ½Ã°£
-        float speed = 1f; // ¿òÁ÷ÀÓ ¼Óµµ
+        // ì›€ì§ì„ ì²˜ë¦¬
+        float duration = 1.3f; // ì›€ì§ì„ ì§€ì† ì‹œê°„
+        float speed = 1f; // ì›€ì§ì„ ì†ë„
         float elapsedTime = 0;
 
         while (elapsedTime < duration)
@@ -85,7 +85,7 @@ public class NoCheatBoxScript : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null;
         }        
-        // ½ºÅ©¸³Æ®¸¦ ´Ù½Ã È°¼ºÈ­
+        // ìŠ¤í¬ë¦½íŠ¸ë¥¼ ë‹¤ì‹œ í™œì„±í™”
         foreach (var script in scripts)
         {
             script.enabled = true;

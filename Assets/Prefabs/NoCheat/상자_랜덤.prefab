@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1820424229910032768}
   - component: {fileID: 923831167}
   - component: {fileID: 6797979305219157842}
+  - component: {fileID: 3823050433681523312}
   m_Layer: 6
   m_Name: "\uC0C1\uC790_\uB79C\uB364"
   m_TagString: CanDestroy
@@ -75,12 +76,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 4
-  m_Sprite: {fileID: 21300000, guid: 3a21fe712fa4ad94b84bc98994122844, type: 3}
+  m_Sprite: {fileID: -913523708, guid: e2a079f65541cd44db013a8b8f2f35cd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 5.47, y: 5.302028}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -120,16 +121,37 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.0056123734, y: 0.016839385}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.75, y: 1.5}
-    newSize: {x: 5.47, y: 5.302028}
+    oldSize: {x: 1, y: 1}
+    newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.2223682, y: 1.1744401}
+  m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &3823050433681523312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1820424229910032782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 591f2d96f9ce54246b2b67b49d2d47a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Items:
+  - {fileID: 4420429170575227876, guid: ad18e7cd3d998ed4ba293e9805465efb, type: 3}
+  - {fileID: 6502204577659205711, guid: 7252d2397f0307849a62cfb3a1f2bbe1, type: 3}
+  brokenBoxImg: {fileID: -355312022, guid: e2a079f65541cd44db013a8b8f2f35cd, type: 3}
+  sensorBoxSize: {x: 1, y: 0.1}
+  controlYLength: -0.13
+  playerHeadLayer:
+    serializedVersion: 2
+    m_Bits: 2048

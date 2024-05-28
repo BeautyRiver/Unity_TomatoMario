@@ -21,7 +21,7 @@ public class Enemy : MonoBehaviour
     protected BoxCollider2D boxCollider; // BoxCollider2D 컴포넌트
     protected SpriteRenderer spriteRenderer;
     public GameObject hitBoxCollider; // 히트박스
-    public Animator Anim; // 애니메이터
+    public Animator anim; // 애니메이터
     public LayerMask layerMask; // 레이어 마스크(지면 체크 등에 사용)
 
 
@@ -30,12 +30,12 @@ public class Enemy : MonoBehaviour
         // 컴포넌트 초기화
         rb = GetComponent<Rigidbody2D>();
         boxCollider = GetComponent<BoxCollider2D>();
-        Anim = GetComponent<Animator>();
+        anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-
+        hitBoxCollider = transform.GetChild(0).gameObject;
         // 코루틴 시작
-        StartCoroutine(CalcCoolTime());
-        /*StartCoroutine ( ResetCollider ( ) );*/
+        // StartCoroutine(CalcCoolTime());
+        // StartCoroutine ( ResetCollider ( ) );
     }
 
     // 히트박스 리셋 코루틴
@@ -74,7 +74,7 @@ public class Enemy : MonoBehaviour
     // 특정 애니메이션이 재생 중인지 확인하는 함수
     public bool IsPlayingAnim(string AnimName)
     {
-        if (Anim.GetCurrentAnimatorStateInfo(0).IsName(AnimName))
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName(AnimName))
         {
             return true;
         }
@@ -86,7 +86,7 @@ public class Enemy : MonoBehaviour
     {
         if (!IsPlayingAnim(AnimName))
         {
-            Anim.SetTrigger(AnimName);
+            anim.SetTrigger(AnimName);
         }
     }
 

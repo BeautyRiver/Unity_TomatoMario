@@ -5,28 +5,33 @@ using UnityEngine;
 public class PlayerCollision : MonoBehaviour
 {
     private PlayerMove pm;
-    public float fallWaitTime; // ¸öÀÌ Ä¿Áø ÈÄ ¹Ù´ÚÀÌ ¶³¾îÁö´Â ½Ã°£
+    public float fallWaitTime; // ëª¸ì´ ì»¤ì§„ í›„ ë°”ë‹¥ì´ ë–¨ì–´ì§€ëŠ” ì‹œê°„
     private void Awake()
     {
         pm = GetComponent<PlayerMove>();
     }
 
-    #region Collision, Trigger °ü·Ã    
+    #region Collision, Trigger ê´€ë ¨        
     private void OnCollisionEnter2D(Collision2D collision)
     {
         GameObject obj = collision.gameObject;
-        // EnemyÀÇ ¸Ó¸®¸¦ °¨ÁöÇßÀ»¶§
+        // Enemyì˜ ë¨¸ë¦¬ë¥¼ ê°ì§€í–ˆì„ë•Œ
         if (gameObject.CompareTag("Player") && obj.tag == "EnemyHitBox")
         {
-            if (pm.canKillEnemy) // Enemy ¸Ó¸®¸¦ ¹ß ¹Ø¿¡ µÎ°íÀÖÀ¸¸é Á×ÀÏ ¼ö ÀÖÀ½
+            if (pm.canKillEnemy) // Enemy ë¨¸ë¦¬ë¥¼ ë°œ ë°‘ì— ë‘ê³ ìˆìœ¼ë©´ ì£½ì¼ ìˆ˜ ìˆìŒ
             {
                 pm.OnAttack(collision.gameObject);
             }
+            else
+            {
+                pm.OnDie();
+            }
         }
-        // ÇÔÁ¤ or Enemy¿Í Ãæµ¹½Ã »ç¸Á
+        // í•¨ì • or Enemyì™€ ì¶©ëŒì‹œ ì‚¬ë§
         if (gameObject.CompareTag("Player") && obj.tag == "Enemy" || obj.CompareTag("Spike"))
         {
             pm.OnDie();
+            Debug.Log("ëª¬ìŠ¤í„° ì¶©ëŒ");
         }
 
         if (obj.tag == "Item")
@@ -39,45 +44,16 @@ public class PlayerCollision : MonoBehaviour
 
                 gameObject.tag = "Player_muscle";
                 transform.localScale = pm.initialScale * 6f;
-                // ÇÃ·¹ÀÌ¾îÀÇ ³ôÀÌµµ Áõ°¡
+                // í”Œë ˆì´ì–´ì˜ ë†’ì´ë„ ì¦ê°€
                 float heightIncrease = (transform.localScale.y - pm.initialScale.y) / 2;
                 transform.position = new Vector2(transform.position.x, transform.position.y + heightIncrease);
                 //animator.runtimeAnimatorController = muscleAnimatorController;
                 pm.isMuscle = true;
             }
             Destroy(collision.gameObject);
-        }
-
-        /*// TODO °ÅÀÎÀÌ µÇ¸é ¿ÀºêÁ§Æ®µé ºÎ¼ö°Ô
-        if (gameObject.tag == "Player_muscle" && collision.gameObject.CompareTag("CanDestroy") || collision.gameObject.CompareTag("Spike") || collision.gameObject.CompareTag("Enemy"))
-        {
-            if (collision.rigidbody != null)
-            {
-                float randomAngle = UnityEngine.Random.Range(0f, 360f);
-
-                collision.rigidbody.isKinematic = false;
-                collision.collider.enabled = false;
-                // ¿ÀºêÁ§Æ®¿¡ ·£´ıÇÑ È¸Àü Àû¿ë
-
-                collision.rigidbody.AddForce(Vector2.right * moveDir * 10f, ForceMode2D.Impulse);
-                // ¿ÀºêÁ§Æ®¿¡ Áö¼ÓÀûÀÎ È¸Àü·ÂÀ» Àû¿ë
-                float torqueAmount = moveDir * 20f; // È¸Àü·ÂÀÇ ¾ç°ú ¹æÇâ ¼³Á¤
-                collision.rigidbody.AddTorque(torqueAmount, ForceMode2D.Impulse);
-            }
-        }*/
+        }      
     }
-
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        // ±ÙÀ°¸ÇÀÏ¶§ ¹Ù´Ú¶³¾îÁö°Ô 
-        if (gameObject.tag == "Player_muscle" && collision.gameObject.layer == pm.platFormLayer)
-        {
-            if (collision.rigidbody != null && !pm.isRbOnRunning)
-            {
-                StartCoroutine(pm.RigidbodyOn(collision, fallWaitTime));
-            }
-        }
-    }
+    
 
     #endregion
 }
