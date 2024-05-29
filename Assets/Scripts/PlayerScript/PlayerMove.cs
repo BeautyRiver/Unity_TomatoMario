@@ -57,6 +57,8 @@ public class PlayerMove : MonoBehaviour
     [Header("상태 검사")]
     private bool isChange = false; // 캐릭터를 변경하였는지 (새 캐릭터)
     public bool isGrounded = false; // 땅에 닿았는지 여부
+    public bool isFalling = false; // 떨어지는 중인지 여부
+
     public bool canKillEnemy = false; // 적을 죽일 수 있는지 여부
     public bool isMuscle = false; // 근육 상태 여부
     public bool moveOk = true; // 이동 가능 여부
@@ -119,12 +121,11 @@ public class PlayerMove : MonoBehaviour
             }
             // 애니메이션
             animator.SetBool("isWalking", moveDir != 0);
+                                                    
+            animator.SetBool("isFalling", !isGrounded && rigid.velocity.y < 0);
+            animator.SetBool("isJumping", !isGrounded && rigid.velocity.y > 0);
+            
 
-            bool isFalling = rigid.velocity.y < 0.01f;
-            if (isFalling)
-            {
-                animator.SetBool("isJumping", !isGrounded);
-            }
 
             #region 키 다운 체크            
             // 캐릭터 전환
@@ -148,8 +149,7 @@ public class PlayerMove : MonoBehaviour
                 if (!animator.GetBool("isJumping") && isGrounded && Time.time > lastJumpTime + jumpDelay)
                 {
                     EnabledHeadSensor(true);
-                    rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
-                    animator.SetBool("isJumping", true);
+                    rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);                    
                     audioSource.clip = audioJump;
                     gameManager.SoundOn("jump");
                     lastJumpTime = Time.time;
@@ -165,7 +165,7 @@ public class PlayerMove : MonoBehaviour
             {
                 if (jumpPower <= maxJumpPower)
                 {
-                    jumpPower += 20f * Time.deltaTime;
+                    jumpPower += 40f * Time.deltaTime;
                 }
             }
 

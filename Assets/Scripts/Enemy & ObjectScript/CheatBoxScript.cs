@@ -10,15 +10,15 @@ public class CheatBoxScript : MonoBehaviour
     public enum boxType
     {
         Cheat,
-        Spawn, // ¸Ó¸® ¹Ú´Â »óÀÚ
+        Spawn, // ë¨¸ë¦¬ ë°•ëŠ” ìƒì
         DeathGreenHole,
         MovingPlatform,
     }
     public boxType type;
 
       
-    private bool isMoving = false; // »óÀÚ°¡ ¿òÁ÷ÀÌ°í ÀÖ´ÂÁö È®ÀÎÇÏ´Â ÇÃ·¡±×
-    private GameObject parentObj; // ¹Ú½º
+    private bool isMoving = false; // ìƒìê°€ ì›€ì§ì´ê³  ìˆëŠ”ì§€ í™•ì¸í•˜ëŠ” í”Œë˜ê·¸
+    private GameObject parentObj; // ë°•ìŠ¤
     private SpriteRenderer sprParent;
     private Collider2D colParent;
     private Rigidbody2D rigParent;
@@ -36,7 +36,7 @@ public class CheatBoxScript : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        //ÈÑÀÌÅ©¹Ú½º
+        //í›¼ì´í¬ë°•ìŠ¤
         if (collision.gameObject.tag == "Player_Head")
         {
             if (type == boxType.Cheat && !isMoving)
@@ -58,7 +58,7 @@ public class CheatBoxScript : MonoBehaviour
 
     void OnTriggerStay2D(Collider2D collision)
     {
-        // È¦
+        // í™€
         if (collision.gameObject.tag == "Player")
         {           
             if (type == boxType.DeathGreenHole && PlayerData.Instance.Player.isDownKey)
@@ -68,12 +68,12 @@ public class CheatBoxScript : MonoBehaviour
         }
     }
 
-    // »óÀÚ°¡ À§·Î ¿Ã¶ó°¡´Â ÇÔ¼ö
+    // ìƒìê°€ ìœ„ë¡œ ì˜¬ë¼ê°€ëŠ” í•¨ìˆ˜
     IEnumerator MoveBox()
     {
-        isMoving = true; // ¿òÁ÷ÀÓ ½ÃÀÛ
+        isMoving = true; // ì›€ì§ì„ ì‹œì‘
         parentObj.transform.DOMoveY(parentObj.transform.position.y + 2.5f, 0.3f); 
-        isMoving = false; // ¿òÁ÷ÀÓ Á¾·á
-        yield return new WaitForSeconds(0.6f); // 0.6ÃÊ ´ë±â (»óÀÚ°¡ ¿òÁ÷ÀÌ´Â µ¿¾È ´ë±â)
+        isMoving = false; // ì›€ì§ì„ ì¢…ë£Œ
+        yield return new WaitForSeconds(0.6f); // 0.6ì´ˆ ëŒ€ê¸° (ìƒìê°€ ì›€ì§ì´ëŠ” ë™ì•ˆ ëŒ€ê¸°)
     }
 }

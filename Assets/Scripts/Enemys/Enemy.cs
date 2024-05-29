@@ -1,8 +1,12 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+#if UNITY_EDITOR
+[ExecuteInEditMode]  //<- 이 부분이 에디터에서 작동되도록 선언하는 부분
+#endif
+
 public class Enemy : MonoBehaviour
-{
+{       
     [Header("몬스터의 기본 속성")]
     public int currentHp = 1; // 현재 체력
     public float moveSpeed = 5f; // 이동 속도
@@ -14,8 +18,7 @@ public class Enemy : MonoBehaviour
     public bool isHit = false; // 피격 상태
     public bool isGround = true; // 지면에 있는지 여부
     public bool canAtk = true; // 공격 가능 상태
-    public bool MonsterDirRight; // 몬스터의 방향(오른쪽을 바라보고 있는지 여부)
-
+    public int dir = -1; // 방향
     [Header("컴포넌트")]
     protected Rigidbody2D rb; // Rigidbody2D 컴포넌트
     protected BoxCollider2D boxCollider; // BoxCollider2D 컴포넌트
@@ -23,7 +26,7 @@ public class Enemy : MonoBehaviour
     public GameObject hitBoxCollider; // 히트박스
     public Animator anim; // 애니메이터
     public LayerMask layerMask; // 레이어 마스크(지면 체크 등에 사용)
-
+    public float distance;
 
     protected void Awake()
     {
@@ -84,21 +87,21 @@ public class Enemy : MonoBehaviour
     // 애니메이션 트리거 설정 함수
     public void MyAnimSetTrigger(string AnimName)
     {
-        if (!IsPlayingAnim(AnimName))
+        if (!IsPlayingAnim(AnimName)) // 해당 애니메이션이 재생 중이 아니라면
         {
-            anim.SetTrigger(AnimName);
+            anim.SetTrigger(AnimName); // 애니메이션 트리거 설정
         }
     }
 
     // 몬스터 방향 전환 함수
     protected void MonsterFlip()
     {
-        MonsterDirRight = !MonsterDirRight;
+        dir *= -1; // 방향 전환
 
         Vector3 thisScale = transform.localScale;
         // 스케일을 반전시켜 방향 전환
 
-        if (MonsterDirRight)
+        if (dir == 1)
             thisScale.x = -Mathf.Abs(thisScale.x);
         else
             thisScale.x = Mathf.Abs(thisScale.x);
@@ -108,19 +111,19 @@ public class Enemy : MonoBehaviour
     }
 
     // 플레이어가 몬스터 기준 어디 방향에 있는지 찾는 함수
-    protected bool IsPlayerDir()
-    {
-        if (transform.position.x < PlayerData.Instance.Player.transform.position.x ? MonsterDirRight : !MonsterDirRight)
-        {
-            return true;
-        }
-        return false;
-    }
+    // protected bool IsPlayerDir()
+    // {
+    //     if (transform.position.x < PlayerData.Instance.Player.transform.position.x ? dirRight : !dirRight)
+    //     {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     // 지면 체크 함수
     protected void GroundCheck()
     {
-        if (Physics2D.BoxCast(boxCollider.bounds.center, boxCollider.size, 0, Vector2.down, 0.05f, layerMask))
+        if (Physics2D.BoxCast(boxCollider.bounds.center, boxCollider.bounds.size, 0, Vector2.down, 0.05f, layerMask))
         {
             isGround = true;
         }
@@ -129,7 +132,7 @@ public class Enemy : MonoBehaviour
             isGround = false;
         }
     }
-
+    
     // 데미지를 받는 함수
     public void TakeDamage(int dam)
     {
@@ -153,13 +156,5 @@ public class Enemy : MonoBehaviour
         rb.AddForce(Vector2.up * 10, ForceMode2D.Impulse);
         //Sprite 삭제
         Destroy(gameObject, 4f);
-    }
-
-    protected void OnTriggerEnter2D(Collider2D collision)
-    {
-        //if ( collision.transform.CompareTag ( ?? ) )
-        //{
-        //TakeDamage ( 0 );
-        //}
-    }
+    }    
 }

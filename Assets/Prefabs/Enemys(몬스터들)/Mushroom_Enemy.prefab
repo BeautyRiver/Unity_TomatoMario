@@ -147,7 +147,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentHp: 1
   moveSpeed: 2
-  jumpPower: 9
+  jumpPower: 18
   atkCoolTime: 3
   atkCoolTimeCalc: 3
   isHit: 0
@@ -155,7 +155,7 @@ MonoBehaviour:
   canAtk: 1
   MonsterDirRight: 0
   hitBoxCollider: {fileID: 2437447438464790111}
-  Anim: {fileID: 1751376197724750484}
+  anim: {fileID: 0}
   layerMask:
     serializedVersion: 2
     m_Bits: 64

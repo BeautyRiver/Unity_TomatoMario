@@ -54,6 +54,14 @@ public class PlayerCollision : MonoBehaviour
         }      
     }
     
+    private void OnTriggerEnter2D(Collider2D other) 
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            pm.OnDie();
+            Debug.Log("몬스터 충돌");
+        }
+    }
 
     #endregion
 }
