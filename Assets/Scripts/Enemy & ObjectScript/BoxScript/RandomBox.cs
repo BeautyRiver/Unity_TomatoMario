@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Unity.Burst.Intrinsics;
 using UnityEngine;
 
 public class RandomBox : Box
@@ -16,7 +17,8 @@ public class RandomBox : Box
         if (ranObj.Length > 0)
         {
             int ranIndex = Random.Range(0, ranObj.Length); // 랜덤 인덱스
-            selectObj = Instantiate(ranObj[ranIndex], transform.position, Quaternion.identity, transform); // 랜덤 오브젝트 생성
+            selectObj = ranObj[ranIndex]; // 랜덤 오브젝트 선택
+            selectObj.transform.position = transform.position;
             selectObj.SetActive(false); // 랜덤 오브젝트 비활성화
         }
 
@@ -25,20 +27,11 @@ public class RandomBox : Box
     {
         base.Update();
         if (isBoxOn == true && isSpawned == false)
-        {
-            spriteRenderer.sprite = brokenBoxImg;
+        {            
             isSpawned = true;
+            spriteRenderer.sprite = brokenBoxImg;
             selectObj.SetActive(true); // 랜덤 오브젝트 활성화
             selectObj.GetComponent<DOTweenAnimation>().DOPlay();
         }
-    }
-
-    private void OnDisable()
-    {
-        // 플레이 모드가 종료되면 자식 오브젝트 삭제
-        foreach (Transform child in transform)
-        {
-            Destroy(child.gameObject);
-        }
-    }
+    }  
 }

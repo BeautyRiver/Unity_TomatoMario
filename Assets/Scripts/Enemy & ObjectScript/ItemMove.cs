@@ -34,12 +34,12 @@ public class ItemMove : MonoBehaviour
         // 스케일을 반전시켜 방향 전환
 
         if (dir == 1)
-            thisScale.x = -Mathf.Abs(thisScale.x);
-        else
             thisScale.x = Mathf.Abs(thisScale.x);
+        else
+            thisScale.x = -Mathf.Abs(thisScale.x);
 
         transform.localScale = thisScale;
-        rb.velocity = Vector2.zero;
+        //rb.velocity = Vector2.zero;
     }
 
     private void OnDrawGizmos()
