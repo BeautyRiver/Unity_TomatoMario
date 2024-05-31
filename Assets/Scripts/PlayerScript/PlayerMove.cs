@@ -1,8 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.Burst.Intrinsics;
-using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.UI;
 #if UNITY_EDITOR
@@ -25,55 +22,44 @@ public class PlayerMove : MonoBehaviour
     private AudioSource audioSource;
 
     [Header("플레이어 속성")]
-    [SerializeField] private float maxSpeed = 5.0f; // 최대 이동 속도
-    [SerializeField] private float moveSpeed = 3.0f; // 이동 속도
-
-    [SerializeField] private float jumpPower; // 현재 점프 힘
-    public float minJumpPower = 9f; // 최소 점프 힘
-    public float maxJumpPower = 12f; // 최대 점프 힘
-    public float attackJumpPower; // 점프 후 수직반동
-    private float jumpDelay = 0.5f; // 점프 딜레이
-    private float lastJumpTime; // 마지막 점프 시간
-
     public int life = 3; // 생명
 
-    [HideInInspector] public Vector3 initialScale; // 초기 스케일 값
-    public Vector2 initPos; // 초기 위치
+    [Header("속도")]    
+    [SerializeField] private float maxSpeed; // 최대 이동 속도    
+    [SerializeField] private float moveSpeed; // 이동 속도
 
+    [Header("점프")]
+    public float jumpPower; // 현재 점프 힘
+    public float needTimeForLongJump = 1f; // 긴 점프를 위한 시간
+    public float shortJumpForce = 9f; // 짧은 점프 힘
+    public float longJumpForce = 12f; // 긴 점프 힘
+    public float longJumpTimer;
+
+
+    [Header("위치 관련")]
     public float moveDir; // 이동 방향
-
-    [Header("UI")]
-    public Slider jumpBar; // 점프 파워 바
-
-    [Header("위치 고정")]
     Vector2 fixPos = Vector2.zero; // 고정될 위치
-    private bool isFixPos = false; // 위치 고정 여부
-
+    [HideInInspector]
+    public Vector3 initialScale; // 초기 스케일 값
+    public Vector2 initPos; // 초기 위치
 
     [Header("레이어 마스크")]
     public LayerMask platFormLayer; // 플랫폼 레이어
     public LayerMask enemyHitBoxLayer; // 적 레이어
 
     [Header("상태 검사")]
-    private bool isChange = false; // 캐릭터를 변경하였는지 (새 캐릭터)
     public bool isGrounded = false; // 땅에 닿았는지 여부
-    public bool isFalling = false; // 떨어지는 중인지 여부
-
     public bool canKillEnemy = false; // 적을 죽일 수 있는지 여부
-    public bool isMuscle = false; // 근육 상태 여부
     public bool moveOk = true; // 이동 가능 여부
     public bool isDead = false; // 사망 상태
     public bool isDownKey = false; // 아래키 입력 상태
     [HideInInspector] public bool isRbOnRunning = false; // 중력 코루틴 실행 여부
 
     [Header("컴포넌트")]
-    [HideInInspector] public Rigidbody2D rigid;
-    private SpriteRenderer spriteRenderer;
+    public GameObject headSensor; // 머리 센서
+    private Rigidbody2D rb;
     private Animator animator;
     private BoxCollider2D boxCollider2D; // 박스 콜라이더
-    public RuntimeAnimatorController playerAnimatorController; // 플레이어 애니메이터
-    public RuntimeAnimatorController muscleAnimatorController; // 근육 상태 애니메이터 컨트롤러
-    public RuntimeAnimatorController birdAnimatorController; // 새 애니메이터 *변신
 
     [Header("감지 센서 크기")]
     [SerializeField] private Vector2 groundCheckBoxSize = new Vector2(0.43f, 0.18f);
@@ -84,15 +70,16 @@ public class PlayerMove : MonoBehaviour
 
     void Awake()
     {
-        rigid = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>();
         animator = GetComponentInChildren<Animator>();
         boxCollider2D = GetComponent<BoxCollider2D>();
         audioSource = GetComponent<AudioSource>();
+    }
 
+    private void Start()
+    {
         // 초기 설정
-        jumpPower = minJumpPower;
-        jumpBar.value = minJumpPower;
+        jumpPower = shortJumpForce;
         initialScale = transform.localScale;
         initPos = transform.position;
 
@@ -103,115 +90,106 @@ public class PlayerMove : MonoBehaviour
         transform.position = new Vector3(x, y, z);
 
         life = PlayerPrefs.GetInt("PlayerLife", 3); // PlayerPrefs에서 life 값을 불러오기 
-        isDead = false;
     }
 
     void Update()
     {
         //MoveOk가 true일때만
-        if (moveOk && isChange == false)
+        if (moveOk == true)
         {
-            // 방향전환 및 이동
-            moveDir = Input.GetAxisRaw("Horizontal");
-            
-            if (moveDir != 0)
-            {
-                float newScaleX = Mathf.Sign(moveDir) * Mathf.Abs(transform.localScale.x); // Sign은 부호를 반환하는 함수 (양수면 1, 음수면 -1 0이면 0)
-                transform.localScale = new Vector3(newScaleX, transform.localScale.y, transform.localScale.z); // 방향전환
-            }
-            // 애니메이션
-            animator.SetBool("isWalking", moveDir != 0);
-                                                    
-            animator.SetBool("isFalling", !isGrounded && rigid.velocity.y < 0);
-            animator.SetBool("isJumping", !isGrounded && rigid.velocity.y > 0);
-            
-
-
-            #region 키 다운 체크            
-            // 캐릭터 전환
-            if (Input.GetKeyDown(KeyCode.Tab)) // 탭을 누르고, 아직 변경(새)가 안된 상태이면
-            {
-                rigid.velocity = Vector3.zero;
-                if (isChange == false)
-                {
-                    isChange = true; // 변신 완료
-                    animator.runtimeAnimatorController = birdAnimatorController;
-                }
-                else if (isChange == true)
-                {
-                    isChange = false;
-                    animator.runtimeAnimatorController = playerAnimatorController;
-                }
-            }
-            // 점프
-            if (Input.GetButtonUp("Jump"))
-            {
-                if (!animator.GetBool("isJumping") && isGrounded && Time.time > lastJumpTime + jumpDelay)
-                {
-                    EnabledHeadSensor(true);
-                    rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);                    
-                    audioSource.clip = audioJump;
-                    gameManager.SoundOn("jump");
-                    lastJumpTime = Time.time;
-
-                    // 이벤트 호출
-                    OnPlayerJumped?.Invoke(jumpPower);
-                }
-                jumpPower = minJumpPower;
-            }
-
-            // 점프 파워 차징
-            if (Input.GetButton("Jump"))
-            {
-                if (jumpPower <= maxJumpPower)
-                {
-                    jumpPower += 40f * Time.deltaTime;
-                }
-            }
-
-            // DownKey를 눌렀는지 여부
-            isDownKey = Input.GetKey(KeyCode.DownArrow) ? true : false;
-
-            #endregion
-
-            if (transform.position.y < -7.5f && !(gameObject.layer == LayerMask.NameToLayer("PlayerDie")))
-                OnDie();
-
-            // 카메라의 왼쪽이상으로 이동못하게
-            // CanMovePos();
-
-            jumpBar.value = jumpPower;
+            PlayerKeyDown(); // 플레이어 키 입력
+            PlayerAnmation(); // 플레이어 애니메이션
+            CanMovePos(); // 카메라의 왼쪽이상으로 이동못하게        
+            CheckGroundAndEnemy(); // 바닥 충돌 체크
+            GroundFriction(); // 바닥 마찰력       
         }
-        
-        // 새로 캐릭터가 바뀌었을때
-        if (moveOk && isChange == true)
-        {
-            if(Input.GetKey(KeyCode.UpArrow))
-            {
-                rigid.velocity = Vector2.up * 3.5f;
-            }
-        }
-        
-        // 바닥 충돌 체크
-        CheckGroundAndEnemy();
-        GroundFriction();
 
     }
+
     void FixedUpdate()
-    {        
-        if (moveOk && isChange == false)
+    {
+        if (moveOk == true)
         {
-            rigid.AddForce(new Vector2(moveDir * moveSpeed, 0),ForceMode2D.Force);
-            if (Mathf.Abs(rigid.velocity.x) > maxSpeed)
-            {
-                // rigid.velocity.y는 그대로 유지하면서 x축 속도만 조정
-                rigid.velocity = new Vector2(Mathf.Sign(rigid.velocity.x) * maxSpeed, rigid.velocity.y);
-            }
-
-            if (rigid.velocity.y > maxJumpPower)
-                rigid.velocity = new Vector2(rigid.velocity.x, maxJumpPower);            
+            PlayerMoveMent();
+            HeadSensorControll();
         }
     }
+
+    private void PlayerMoveMent()
+    {
+        // 이동
+        rb.AddForce(new Vector2(moveDir * moveSpeed, 0), ForceMode2D.Force);
+
+        // 최대 속도 제한
+        if (Mathf.Abs(rb.velocity.x) > maxSpeed)
+        {
+            // rb.velocity.y는 그대로 유지하면서 x축 속도만 조정
+            rb.velocity = new Vector2(Mathf.Sign(rb.velocity.x) * maxSpeed, rb.velocity.y);
+        }
+
+        // 플레이어 최대 점프 제한
+        if (rb.velocity.y > longJumpForce)
+            rb.velocity = new Vector2(rb.velocity.x, longJumpForce);
+    }
+
+    private void PlayerAnmation()
+    {
+        // PlayerFlip
+        if (moveDir != 0) // 움직이고 있을때
+        {
+            float newScaleX = Mathf.Sign(moveDir) * Mathf.Abs(transform.localScale.x); // Sign은 부호를 반환하는 함수 (양수면 1, 음수면 -1 0이면 0)
+            transform.localScale = new Vector3(newScaleX, transform.localScale.y, transform.localScale.z); // 방향전환
+        }
+        animator.SetBool("isWalking", moveDir != 0); // 걷기 애니메이션
+        animator.SetBool("isFalling", !isGrounded && rb.velocity.y < 0); // 낙하 애니메이션
+        animator.SetBool("isJumping", !isGrounded && rb.velocity.y > 0); // 점프 애니메이션
+    }
+
+    private void PlayerKeyDown()
+    {
+        // 방향전환 및 이동
+        moveDir = Input.GetAxisRaw("Horizontal");
+        // 점프
+        if (Input.GetButtonUp("Jump") && isGrounded)
+        {
+            if (longJumpTimer > needTimeForLongJump) // 점프를 꾹 누르면            
+            {
+                jumpPower = longJumpForce;
+            }
+            else
+            {
+                jumpPower = shortJumpForce;
+            }
+            longJumpTimer = 0f; // 타이머 초기화
+            rb.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse); // 점프                   
+            audioSource.clip = audioJump; // 오디오 클립 설정
+            gameManager.SoundOn("jump"); // 점프 사운드
+
+            // 이벤트 호출
+            OnPlayerJumped?.Invoke(jumpPower);
+            
+            jumpPower = shortJumpForce;
+        }
+
+        // 점프 파워 차징
+        if (Input.GetButton("Jump") && isGrounded)
+        {
+            longJumpTimer += Time.deltaTime;
+        }
+
+        // DownKey를 눌렀는지 여부
+        isDownKey = Input.GetKey(KeyCode.DownArrow) ? true : false;
+    }
+
+    // Head 센서 컨트롤
+    private void HeadSensorControll()
+    {
+        if (rb.velocity.y < 0f)
+            headSensor.SetActive(false); // 머리 센서 비활성화
+        else if (rb.velocity.y > 0f)
+            headSensor.SetActive(true); // 머리 센서 활성화
+    }
+
 
     // 카메라의 왼쪽이상으로 이동못하게
     private void CanMovePos()
@@ -220,27 +198,27 @@ public class PlayerMove : MonoBehaviour
 
         if (screenPoint.x < 0f)
             screenPoint.x = 0f;
-
+            
+        if (screenPoint.y < 0f)
+            OnDie();
+        
         transform.position = Camera.main.ViewportToWorldPoint(screenPoint);
     }
-
 
     //몬스터 공격할때
     public void OnAttack(GameObject enemy)
     {
         //적 사망
         Enemy monster = enemy.GetComponentInParent<Enemy>();
-        monster.gameObject.tag = "DeadEnemy";
-        monster.OnEnemyDie();     
+        monster.gameObject.tag = "DeadEnemy"; // 죽은 몬스터 태그 변경
+        monster.OnEnemyDie(); // 몬스터 사망
 
         //밟았을때 위로 점프되기
-        rigid.velocity = new Vector2(rigid.velocity.x, 0);
-        rigid.AddForce(Vector2.up * attackJumpPower, ForceMode2D.Impulse);
-
+        rb.velocity = new Vector2(rb.velocity.x, 0);
+        rb.AddForce(Vector2.up * shortJumpForce, ForceMode2D.Impulse);
 
         //점수증가
         gameManager.stagePoint += 100;
-
     }
 
     //Player 사망
@@ -251,10 +229,10 @@ public class PlayerMove : MonoBehaviour
             //Sprite 콜라이더 끄기
             boxCollider2D.enabled = false;
 
-            EnabledHeadSensor(false);
+            // EnabledHeadSensor(false);
 
-            rigid.velocity = Vector2.zero;
-            rigid.gravityScale = 0;
+            rb.velocity = Vector2.zero;
+            rb.gravityScale = 0;
             moveOk = false;
             gameObject.layer = LayerMask.NameToLayer("PlayerDie");
             life--;
@@ -266,6 +244,40 @@ public class PlayerMove : MonoBehaviour
         }
 
     }
+     // 몬스터 공격, 땅 체크 확인
+    private void CheckGroundAndEnemy()
+    {
+        Bounds bounds = boxCollider2D.bounds; // 박스 콜라이더의 경계
+        footPosition = new Vector2(bounds.center.x, bounds.min.y); // 발 위치
+
+        isGrounded = Physics2D.BoxCast(footPosition, groundCheckBoxSize, 0, Vector2.down, 0.01f, platFormLayer) ? true : false; // 땅에 닿았는지 여부
+        canKillEnemy = Physics2D.BoxCast(footPosition, enemyCheckBoxSize, 0, Vector2.down, 0.01f, enemyHitBoxLayer) ? true : false; // 적을 죽일 수 있는지 여부
+    }
+
+    // 토관에 들어갈때
+    public void InGreenHole(Vector2 pos)
+    {
+        boxCollider2D.enabled = false;
+        moveOk = false;
+        fixPos = new Vector2(pos.x, transform.position.y);
+        rb.velocity = Vector2.zero;
+        animator.SetBool("inGreenHole", true);
+        rb.gravityScale = 0;
+        boxCollider2D.enabled = false;
+        StartCoroutine(GreenHoleMoveDown());
+    }
+    
+    // 바닥 마찰력
+    private void GroundFriction()
+    {
+        if (isGrounded)
+        {
+            if (Mathf.Abs(moveDir) <= 0.01f) // 이동중이 아닐때
+                rb.velocity = new Vector2(Mathf.SmoothDamp(rb.velocity.x, 0f, ref refVelocity, slideRate), rb.velocity.y); // 부드러운 감속
+        }
+    }
+
+    #region  코루틴
     //죽을때 마리오처럼 죽게하는 모션 코루틴
     IEnumerator DieMotion()
     {
@@ -273,10 +285,10 @@ public class PlayerMove : MonoBehaviour
         animator.SetTrigger("doDying");
         isDead = true;
         yield return new WaitForSeconds(0.3f);
-        rigid.gravityScale = 1;
-        rigid.AddForce(Vector2.up * speed, ForceMode2D.Impulse);
+        rb.gravityScale = 1;
+        rb.AddForce(Vector2.up * speed, ForceMode2D.Impulse);
         yield return new WaitForSeconds(0.7f);
-        rigid.gravityScale = 8;
+        rb.gravityScale = 8;
         //Sprite 삭제
         StartCoroutine(DeActive(1));
     }
@@ -287,32 +299,6 @@ public class PlayerMove : MonoBehaviour
         yield return new WaitForSeconds(time);
         //gameObject.SetActive(false);
         gameManager.DeathSceneOn(); // 데쓰씬 키기
-    }
-
-    // 몬스터 공격, 땅 체크 확인
-    private void CheckGroundAndEnemy()
-    {
-        Bounds bounds = boxCollider2D.bounds;
-        footPosition = new Vector2(bounds.center.x, bounds.min.y);
-        canKillEnemy = Physics2D.OverlapBox(footPosition, enemyCheckBoxSize, 0, enemyHitBoxLayer); // 발 밑에 적의 머리가 있으면 죽일 수 있음
-        //isGrounded = Physics2D.OverlapBox(footPosition, groundCheckBoxSize, 0, platFormLayer);
-
-        isGrounded = Physics2D.BoxCast(footPosition, groundCheckBoxSize , 0, Vector2.down,0.01f, platFormLayer) ?  true : false;
-        canKillEnemy = Physics2D.BoxCast(footPosition, enemyCheckBoxSize, 0, Vector2.down, 0.01f, enemyHitBoxLayer) ? true : false;        
-        EnabledHeadSensor(!isGrounded); // 점프할때만 머리 센서 키기
-    }
-
-    // 토관에 들어갈때
-    public void InGreenHole(Vector2 pos)
-    {
-        boxCollider2D.enabled = false;
-        moveOk = false;
-        fixPos = new Vector2(pos.x, transform.position.y);
-        rigid.velocity = Vector2.zero;
-        animator.SetBool("inGreenHole", true);
-        rigid.gravityScale = 0;
-        boxCollider2D.enabled = false;
-        StartCoroutine(GreenHoleMoveDown());
     }
 
     // 토관 들어가는 모션
@@ -329,30 +315,7 @@ public class PlayerMove : MonoBehaviour
         animator.SetBool("inGreenHole", false);
         OnDie();
     }
-
-    // 머리 센서끄기
-    public void EnabledHeadSensor(bool enable)
-    {
-        // 모든 자식 오브젝트들 중에서 'HeadSensor' 태그를 가진 오브젝트를 찾음
-        foreach (Transform child in transform)
-        {
-            if (child.CompareTag("Player_Head"))
-            {
-                BoxCollider2D headSensor = child.GetComponent<BoxCollider2D>();
-                headSensor.enabled = enable;
-                return;
-            }
-        }
-    }
-
-    void GroundFriction()
-    {
-        if (isGrounded)
-        {
-            if(Mathf.Abs(moveDir) <= 0.01f)
-                rigid.velocity = new Vector2 (Mathf.SmoothDamp(rigid.velocity.x, 0f, ref refVelocity, slideRate), rigid.velocity.y);
-        }
-    }
+#endregion
 
     #region 디버그
     // 기즈모 그리기
@@ -362,22 +325,21 @@ public class PlayerMove : MonoBehaviour
         if (boxCollider2D != null)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(footPosition, groundCheckBoxSize);
-            Gizmos.color = Color.blue;
-            Gizmos.DrawWireCube(footPosition, enemyCheckBoxSize);
-
+            Gizmos.DrawWireCube(footPosition + Vector2.down * 0.01f, enemyCheckBoxSize);
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(footPosition + Vector2.down * 0.01f, groundCheckBoxSize);
         }
 
-        if (isGrounded)
-        {
-            Debug.Log("땅에 닿음");
-        }
-        if (canKillEnemy)
-        {
-            Debug.Log("적을 죽일 수 있음");
-        }
+        //     if (isGrounded)
+        //     {
+        //         Debug.Log("땅에 닿음");
+        //     }
+        //     if (canKillEnemy)
+        //     {
+        //         Debug.Log("적을 죽일 수 있음");
+        //     }
     }
 #endif
 
-#endregion
+    #endregion
 }

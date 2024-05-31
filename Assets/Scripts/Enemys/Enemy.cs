@@ -28,7 +28,7 @@ public class Enemy : MonoBehaviour
     public LayerMask layerMask; // 레이어 마스크(지면 체크 등에 사용)
     public float distance;
 
-    protected void Awake()
+    protected virtual void Awake()
     {
         // 컴포넌트 초기화
         rb = GetComponent<Rigidbody2D>();

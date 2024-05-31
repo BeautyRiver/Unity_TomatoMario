@@ -36,30 +36,36 @@ public class PlayerCollision : MonoBehaviour
 
         if (obj.tag == "Item")
         {
-            if (!pm.isMuscle)
-            {
-                pm.rigid.AddForce(Vector2.up * 5f, ForceMode2D.Impulse);
+            // if (!pm.isMuscle)
+            // {
+            //     pm.rigid.AddForce(Vector2.up * 5f, ForceMode2D.Impulse);
 
-                pm.EnabledHeadSensor(false);
+            //     pm.EnabledHeadSensor(false);
 
-                gameObject.tag = "Player_muscle";
-                transform.localScale = pm.initialScale * 6f;
-                // 플레이어의 높이도 증가
-                float heightIncrease = (transform.localScale.y - pm.initialScale.y) / 2;
-                transform.position = new Vector2(transform.position.x, transform.position.y + heightIncrease);
-                //animator.runtimeAnimatorController = muscleAnimatorController;
-                pm.isMuscle = true;
-            }
+            //     gameObject.tag = "Player_muscle";
+            //     transform.localScale = pm.initialScale * 6f;
+            //     // 플레이어의 높이도 증가
+            //     float heightIncrease = (transform.localScale.y - pm.initialScale.y) / 2;
+            //     transform.position = new Vector2(transform.position.x, transform.position.y + heightIncrease);
+            //     //animator.runtimeAnimatorController = muscleAnimatorController;
+            //     pm.isMuscle = true;
+            // }
             Destroy(collision.gameObject);
         }      
     }
     
     private void OnTriggerEnter2D(Collider2D other) 
     {
-        if (other.CompareTag("Enemy"))
+        if (other.CompareTag("Enemy") || other.CompareTag("Spike"))
         {
             pm.OnDie();
             Debug.Log("몬스터 충돌");
+        }
+
+        if (other.CompareTag("Cloud"))
+        {
+            pm.OnDie();
+            other.gameObject.GetComponent<Cloud>().spriteRenderer.sprite = other.gameObject.GetComponent<Cloud>().attackSprite;
         }
     }
 

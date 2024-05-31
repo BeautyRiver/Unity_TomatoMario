@@ -53,28 +53,28 @@ public class GameManager : MonoBehaviour
         deathScene.gameObject.SetActive(false);        
     }
 
-    // PlayerPrefsÀ¸·Î ÀúÀåµÈ LifeÃÊ±âÈ­
+    // PlayerPrefsìœ¼ë¡œ ì €ì¥ëœ Lifeì´ˆê¸°í™”
     public void LifeInitBtn()
     {        
         PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
-        player.life = PlayerPrefs.GetInt("PlayerLife", 3); // PlayerPrefs¿¡¼­ life °ªÀ» ºÒ·¯¿À±â 
+        player.life = PlayerPrefs.GetInt("PlayerLife", 3); // PlayerPrefsì—ì„œ life ê°’ì„ ë¶ˆëŸ¬ì˜¤ê¸° 
         SceneManager.LoadScene(0);
     }
 
     public void SoundOn(string action)
     {
-        switch (action)
-        {
-            case "jump":
-                jumpSource.Play();
-                break;
-            case "death":
-                deathSource.Play();
-                break;
-            case "clear":
-                clearSource.Play();
-                break;
-        }
+        // switch (action)
+        // {
+        //     case "jump":
+        //         jumpSource.Play();
+        //         break;
+        //     case "death":
+        //         deathSource.Play();
+        //         break;
+        //     case "clear":
+        //         clearSource.Play();
+        //         break;
+        // }
     }
 }
