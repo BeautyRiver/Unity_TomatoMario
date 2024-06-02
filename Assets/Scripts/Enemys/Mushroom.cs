@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Mushroom_Enemy : Enemy
+public class Mushroom : Enemy
 {
     public Transform[] wallCheck;
 
