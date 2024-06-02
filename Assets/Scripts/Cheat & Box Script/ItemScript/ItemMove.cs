@@ -18,11 +18,12 @@ public class ItemMove : MonoBehaviour
     
     void FixedUpdate()
     {
+        rb.velocity = new Vector2(transform.localScale.x * speed, rb.velocity.y);
+
         if (Physics2D.OverlapCircle(wallCheck.position, 0.01f, platformLayer))
         {
             Flip();
         }
-        rb.velocity = new Vector2(dir * speed, rb.velocity.y);
     }
 
     //  방향 전환 함수

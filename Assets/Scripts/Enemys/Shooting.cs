@@ -9,9 +9,12 @@ public class Shooting : MonoBehaviour
         Up = 1,
         Down = -1
     }
-    public Dir dir;
+    private Dir dir;
     private void Awake() 
     {
+        // 부모의 DetectOption의 DetectType이 Up이면 Up, Down이면 Down
+        dir = transform.parent.GetComponent<ShotEnemyTrigger>().dectType == DetectOption.DetectType.Up ? Dir.Up : Dir.Down; 
+        
         if (dir == Dir.Up)
         {
             transform.GetChild(0).transform.localEulerAngles = new Vector3(0,0,-90);

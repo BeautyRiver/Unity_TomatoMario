@@ -21,7 +21,7 @@ public class Box : MonoBehaviour
     protected virtual void Awake()
     {
         boxCollider2D = GetComponent<BoxCollider2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();        
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     protected virtual void Update()
@@ -36,9 +36,10 @@ public class Box : MonoBehaviour
         else
         {
             isBoxOn = false;
-        }        
+        }
     }
-    
+
+#if UNITY_EDITOR
     protected void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
@@ -47,4 +48,5 @@ public class Box : MonoBehaviour
         Gizmos.color = Color.blue;
         Gizmos.DrawWireCube(new Vector2(bounds.center.x, bounds.min.y + yOffset), seonsorSize);
     }
+#endif
 }
