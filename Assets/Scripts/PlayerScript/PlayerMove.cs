@@ -2,10 +2,9 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-#if UNITY_EDITOR
-[ExecuteInEditMode]  //<- 이 부분이 에디터에서 작동되도록 선언하는 부분
-#endif
-
+/*#if UNITY_EDITOR
+[ExecuteInEditMode]
+#endif*/
 
 public class PlayerMove : MonoBehaviour
 {
@@ -24,7 +23,7 @@ public class PlayerMove : MonoBehaviour
     [Header("플레이어 속성")]
     public int life = 3; // 생명
 
-    [Header("속도")]    
+    [Header("속도")]
     [SerializeField] private float maxSpeed; // 최대 이동 속도    
     [SerializeField] private float moveSpeed; // 이동 속도
 
@@ -167,7 +166,7 @@ public class PlayerMove : MonoBehaviour
 
             // 이벤트 호출
             OnPlayerJumped?.Invoke(jumpPower);
-            
+
             jumpPower = shortJumpForce;
         }
 
@@ -198,10 +197,10 @@ public class PlayerMove : MonoBehaviour
 
         if (screenPoint.x < 0f)
             screenPoint.x = 0f;
-            
-        if (screenPoint.y < 0f)
+
+        if (screenPoint.y < -8f)
             OnDie();
-        
+
         transform.position = Camera.main.ViewportToWorldPoint(screenPoint);
     }
 
@@ -244,7 +243,7 @@ public class PlayerMove : MonoBehaviour
         }
 
     }
-     // 몬스터 공격, 땅 체크 확인
+    // 몬스터 공격, 땅 체크 확인
     private void CheckGroundAndEnemy()
     {
         Bounds bounds = boxCollider2D.bounds; // 박스 콜라이더의 경계
@@ -266,7 +265,7 @@ public class PlayerMove : MonoBehaviour
         boxCollider2D.enabled = false;
         StartCoroutine(GreenHoleMoveDown());
     }
-    
+
     // 바닥 마찰력
     private void GroundFriction()
     {
@@ -277,6 +276,10 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
+    public void Stop()
+    {
+        rb.velocity = Vector2.zero;
+    }
     #region  코루틴
     //죽을때 마리오처럼 죽게하는 모션 코루틴
     IEnumerator DieMotion()
@@ -315,13 +318,13 @@ public class PlayerMove : MonoBehaviour
         animator.SetBool("inGreenHole", false);
         OnDie();
     }
-#endregion
+    #endregion
 
     #region 디버그
-    // 기즈모 그리기
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
+
         if (boxCollider2D != null)
         {
             Gizmos.color = Color.red;
@@ -338,6 +341,7 @@ public class PlayerMove : MonoBehaviour
         //     {
         //         Debug.Log("적을 죽일 수 있음");
         //     }
+
     }
 #endif
 

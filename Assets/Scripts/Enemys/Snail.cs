@@ -6,7 +6,7 @@ public class Snail : Enemy
 {
     public Transform wallCheck;
 
-    private void Awake() 
+    protected override void Awake() 
     {
         base.Awake();
     }
@@ -24,11 +24,12 @@ public class Snail : Enemy
                 MonsterFlip();
             }
         }    
-    }    
-    
+    }
+#if UNITY_EDITOR
     private void OnDrawGizmos() 
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawSphere(wallCheck.position, 0.01f);
     }
+#endif
 }

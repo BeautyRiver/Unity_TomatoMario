@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
-[ExecuteInEditMode]  //<- 이 부분이 에디터에서 작동되도록 선언하는 부분
+[ExecuteInEditMode]
 #endif
 public class Box : MonoBehaviour
 {
@@ -42,11 +42,15 @@ public class Box : MonoBehaviour
 #if UNITY_EDITOR
     protected void OnDrawGizmos()
     {
+        if (!Application.isPlaying)
+            UnityEditor.SceneView.RepaintAll();
+
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(transform.position, transform.localScale);
 
         Gizmos.color = Color.blue;
         Gizmos.DrawWireCube(new Vector2(bounds.center.x, bounds.min.y + yOffset), seonsorSize);
+
     }
 #endif
 }

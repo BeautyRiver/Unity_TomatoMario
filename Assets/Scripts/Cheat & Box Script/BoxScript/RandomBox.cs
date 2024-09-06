@@ -17,12 +17,12 @@ public class RandomBox : Box
         if (ranObj.Length > 0)
         {
             int ranIndex = Random.Range(0, ranObj.Length); // 랜덤 인덱스
-            selectObj = ranObj[ranIndex]; // 랜덤 오브젝트 선택
+            selectObj = ranObj[ranIndex].gameObject; // 랜덤 오브젝트 선택
             selectObj.transform.position = transform.position;
             selectObj.SetActive(false); // 랜덤 오브젝트 비활성화
         }
-
     }
+
     protected override void Update()
     {
         base.Update();

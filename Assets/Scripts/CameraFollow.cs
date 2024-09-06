@@ -11,6 +11,7 @@ public class CameraFollow : MonoBehaviour
 
     private void Start()
     {
+        transform.position = new Vector3(player.position.x, transform.position.y, transform.position.z);
         // 초기 minX 값을 현재 카메라의 X 위치로 설정
         minX = transform.position.x;
     }

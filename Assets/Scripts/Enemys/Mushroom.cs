@@ -33,6 +33,7 @@ public class Mushroom : Enemy
     }
     
 
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
@@ -48,6 +49,7 @@ public class Mushroom : Enemy
         // if (Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y + 0.1f), -transform.localScale.x * transform.right, 1f, layerMask))
         //     Debug.Log("레이캐스트 감지");
     }
+#endif
 
     /*protected void OnTriggerEnter2D ( Collider2D collision )
     {

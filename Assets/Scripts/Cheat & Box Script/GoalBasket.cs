@@ -8,22 +8,25 @@ using UnityEngine.SceneManagement;
 
 public class GoalBasket : MonoBehaviour
 {
-    public Image clearScene;
-    public TextMeshProUGUI clearText;
-    private PlayerMove playerMove;
+    public GameObject clearScene;
+
+    private Image clearImage;
+    private TextMeshProUGUI clearText;
+    public PlayerMove playerMove;
     private void Awake()
     {
-        playerMove = FindObjectOfType<PlayerMove>();
+        clearImage = clearScene.GetComponentInChildren<Image>();
+        clearText = clearScene.GetComponentInChildren<TextMeshProUGUI>();
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.CompareTag("Player"))
         {
-            FindObjectOfType<GameManager>().SoundOn("clear");
-            playerMove.gameObject.layer = LayerMask.NameToLayer("PlayerDie");
-            playerMove.isDead = true;
+            // FindObjectOfType<GameManager>().SoundOn("clear");
+            playerMove.Stop();
+            playerMove.gameObject.layer = LayerMask.NameToLayer("PlayerDie");                        
             playerMove.moveOk = false;
-            clearScene.DOFade(1, 1.0f).OnComplete(() =>
+            clearImage.DOFade(1, 1.0f).OnComplete(() =>
             {
                 clearText.DOFade(1, 1.0f).OnComplete(() =>
                 {

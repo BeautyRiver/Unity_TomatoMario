@@ -43,10 +43,11 @@ public class ItemMove : MonoBehaviour
         //rb.velocity = Vector2.zero;
     }
 
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawSphere(wallCheck.position, 0.01f);
     }
-
+#endif
 }
