@@ -25,7 +25,7 @@ public class GoalBasket : MonoBehaviour
             // FindObjectOfType<GameManager>().SoundOn("clear");
             playerMove.Stop();
             playerMove.gameObject.layer = LayerMask.NameToLayer("PlayerDie");                        
-            playerMove.moveOk = false;
+            playerMove.isDead = true;
             clearImage.DOFade(1, 1.0f).OnComplete(() =>
             {
                 clearText.DOFade(1, 1.0f).OnComplete(() =>

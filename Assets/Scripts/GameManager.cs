@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if ((collision.CompareTag("Player") || collision.CompareTag("Player_muscle")) && !player.isDead)
+        if (collision.CompareTag("Player"))
         {
             player.OnDie();
         }
@@ -64,17 +64,17 @@ public class GameManager : MonoBehaviour
 
     public void SoundOn(string action)
     {
-        // switch (action)
-        // {
-        //     case "jump":
-        //         jumpSource.Play();
-        //         break;
-        //     case "death":
-        //         deathSource.Play();
-        //         break;
-        //     case "clear":
-        //         clearSource.Play();
-        //         break;
-        // }
+        switch (action)
+        {
+            case "jump":
+                jumpSource.Play();
+                break;
+            case "death":
+                deathSource.Play();
+                break;
+            case "clear":
+                clearSource.Play();
+                break;
+        }
     }
 }

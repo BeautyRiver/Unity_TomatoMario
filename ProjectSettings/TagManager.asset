@@ -19,6 +19,7 @@ TagManager:
   - EnemyHitBox
   - DeadEnemy
   - Cloud
+  - Pipe
   layers:
   - Default
   - TransparentFX
@@ -56,12 +57,12 @@ TagManager:
   - name: BackGround
     uniqueID: 1463541561
     locked: 0
-  - name: Default
-    uniqueID: 0
-    locked: 0
   - name: Platform
     uniqueID: 779995605
     locked: 0
   - name: Player
     uniqueID: 1497343441
+    locked: 0
+  - name: Default
+    uniqueID: 0
     locked: 0

@@ -47,12 +47,12 @@ public class PlayerMove : MonoBehaviour
     public LayerMask enemyHitBoxLayer; // 적 레이어
 
     [Header("상태 검사")]
-    public bool isGrounded = false; // 땅에 닿았는지 여부
-    public bool canKillEnemy = false; // 적을 죽일 수 있는지 여부
-    public bool moveOk = true; // 이동 가능 여부
-    public bool isDead = false; // 사망 상태
-    public bool isDownKey = false; // 아래키 입력 상태
-    [HideInInspector] public bool isRbOnRunning = false; // 중력 코루틴 실행 여부
+    public bool isGrounded; // 땅에 닿았는지 여부
+    public bool canKillEnemy; // 적을 죽일 수 있는지 여부
+    public bool isDead; // 사망 상태
+    
+    public bool isBig; // 커진 상태
+    public bool isDownKey; // 아래키 입력 상태
 
     [Header("컴포넌트")]
     public GameObject headSensor; // 머리 센서
@@ -65,6 +65,8 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] private Vector2 enemyCheckBoxSize = new Vector2(1f, 0.5f);
     [SerializeField] private Vector2 footPosition; // 발 위치
     [SerializeField] private float refVelocity;
+
+    [Range(0f, 1f)]
     [SerializeField] private float slideRate;
 
     void Awake()
@@ -78,40 +80,43 @@ public class PlayerMove : MonoBehaviour
     private void Start()
     {
         // 초기 설정
+        Init();
+    }
+
+    private void Init()
+    {
+        isDead = false;
         jumpPower = shortJumpForce;
         initialScale = transform.localScale;
         initPos = transform.position;
-
         float x = PlayerPrefs.GetFloat("SavePointX", transform.position.x);
         float y = PlayerPrefs.GetFloat("SavePointY", transform.position.y);
         float z = PlayerPrefs.GetFloat("SavePointZ", transform.position.z);
-
         transform.position = new Vector3(x, y, z);
-
+        Camera.main.transform.position = new Vector3(transform.position.x, -1.7f, -10);
         life = PlayerPrefs.GetInt("PlayerLife", 3); // PlayerPrefs에서 life 값을 불러오기 
     }
 
     void Update()
     {
-        //MoveOk가 true일때만
-        if (moveOk == true)
-        {
-            PlayerKeyDown(); // 플레이어 키 입력
-            PlayerAnmation(); // 플레이어 애니메이션
-            CanMovePos(); // 카메라의 왼쪽이상으로 이동못하게        
-            CheckGroundAndEnemy(); // 바닥 충돌 체크
-            GroundFriction(); // 바닥 마찰력       
-        }
+        if (isDead)
+            return;
+        
+        PlayerKeyDown(); // 플레이어 키 입력
+        PlayerAnmation(); // 플레이어 애니메이션
+        CanMovePos(); // 카메라의 왼쪽이상으로 이동못하게        
+        CheckGroundAndEnemy(); // 바닥 충돌 체크
+        GroundFriction(); // 바닥 마찰력       
 
     }
 
     void FixedUpdate()
     {
-        if (moveOk == true)
-        {
-            PlayerMoveMent();
-            HeadSensorControll();
-        }
+        if (isDead)
+            return;
+        
+        PlayerMoveMent(); // 플레이어 이동
+        HeadSensorControll(); // 머리 센서 컨트롤
     }
 
     private void PlayerMoveMent()
@@ -177,7 +182,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         // DownKey를 눌렀는지 여부
-        isDownKey = Input.GetKey(KeyCode.DownArrow) ? true : false;
+        //if (Input.GetKeyDown(KeyCode.DownArrow) && )
     }
 
     // Head 센서 컨트롤
@@ -207,6 +212,9 @@ public class PlayerMove : MonoBehaviour
     //몬스터 공격할때
     public void OnAttack(GameObject enemy)
     {
+        if (isDead)
+            return;
+
         //적 사망
         Enemy monster = enemy.GetComponentInParent<Enemy>();
         monster.gameObject.tag = "DeadEnemy"; // 죽은 몬스터 태그 변경
@@ -223,24 +231,22 @@ public class PlayerMove : MonoBehaviour
     //Player 사망
     public void OnDie()
     {
-        if (!isDead)
-        {
-            //Sprite 콜라이더 끄기
-            boxCollider2D.enabled = false;
+        isDead = true;
+        //Sprite 콜라이더 끄기
+        boxCollider2D.enabled = false;
 
-            // EnabledHeadSensor(false);
+        // EnabledHeadSensor(false);
 
-            rb.velocity = Vector2.zero;
-            rb.gravityScale = 0;
-            moveOk = false;
-            gameObject.layer = LayerMask.NameToLayer("PlayerDie");
-            life--;
-            PlayerPrefs.SetInt("PlayerLife", life); // life 값을 PlayerPrefs에 저장합니다.
-            PlayerPrefs.Save();
-            gameManager.SoundOn("death");
+        rb.velocity = Vector2.zero;
+        rb.gravityScale = 0;
+        gameObject.layer = LayerMask.NameToLayer("PlayerDie");
+        life--;
+        PlayerPrefs.SetInt("PlayerLife", life); // life 값을 PlayerPrefs에 저장합니다.
+        PlayerPrefs.Save();
+        gameManager.SoundOn("death");
 
-            StartCoroutine(DieMotion());
-        }
+        StartCoroutine(DieMotion());
+
 
     }
     // 몬스터 공격, 땅 체크 확인
@@ -256,8 +262,8 @@ public class PlayerMove : MonoBehaviour
     // 토관에 들어갈때
     public void InGreenHole(Vector2 pos)
     {
+        isDead = true;
         boxCollider2D.enabled = false;
-        moveOk = false;
         fixPos = new Vector2(pos.x, transform.position.y);
         rb.velocity = Vector2.zero;
         animator.SetBool("inGreenHole", true);
@@ -286,7 +292,6 @@ public class PlayerMove : MonoBehaviour
     {
         float speed = 8;
         animator.SetTrigger("doDying");
-        isDead = true;
         yield return new WaitForSeconds(0.3f);
         rb.gravityScale = 1;
         rb.AddForce(Vector2.up * speed, ForceMode2D.Impulse);
