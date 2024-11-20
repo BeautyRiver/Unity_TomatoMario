@@ -21,7 +21,7 @@ public class ItemMove : MonoBehaviour
         if (MakerManager.instance.isGameMaker)
             return;
 
-        rb.velocity = new Vector2(transform.localScale.x * speed, rb.velocity.y);
+        rb.MovePosition(rb.position + new Vector2(transform.localScale.x * speed * Time.deltaTime, 0));
 
         if (Physics2D.OverlapCircle(wallCheck.position, 0.01f, platformLayer))
         {

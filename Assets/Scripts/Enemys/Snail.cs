@@ -14,7 +14,11 @@ public class Snail : Enemy
     private void FixedUpdate()
     {
         if (MakerManager.instance.isGameMaker)
+        {
+            rb.velocity = Vector2.zero;
+            anim.SetInteger("WalkSpeed", 0);
             return;
+        }
 
         if (isHit)
             return;

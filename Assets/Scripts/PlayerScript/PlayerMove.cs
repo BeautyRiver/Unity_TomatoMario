@@ -92,9 +92,18 @@ public class PlayerMove : MonoBehaviour
         life = PlayerPrefs.GetInt("PlayerLife", 3); // PlayerPrefs에서 life 값을 불러오기 
     }
 
+    public void MakerMode()
+    {
+        rb.gravityScale = 0;
+        rb.velocity = Vector2.zero;
+        boxCollider2D.enabled = false;
+    }
     void Update()
     {
-        if (isDead || MakerManager.instance.isGameMaker)
+        if (MakerManager.instance.isGameMaker)
+            return;
+
+        if (isDead)
             return;
         
         PlayerKeyDown(); // 플레이어 키 입력
@@ -107,6 +116,9 @@ public class PlayerMove : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (MakerManager.instance.isGameMaker)
+            return;
+
         if (isDead)
             return;
         
