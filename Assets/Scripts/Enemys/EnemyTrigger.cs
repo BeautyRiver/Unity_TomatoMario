@@ -7,6 +7,9 @@ public class EnemyTrigger : MonoBehaviour
     public bool isOneOff = false;
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (MakerManager.instance.isGameMaker)
+            return;
+
         if (isOneOff || !other.CompareTag("Player"))
             return;
 

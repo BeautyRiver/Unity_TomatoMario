@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_EDITOR
-[ExecuteInEditMode]
-#endif
+
 public class Box : MonoBehaviour
 {
     [Header("센서")]
@@ -26,6 +24,9 @@ public class Box : MonoBehaviour
 
     protected virtual void Update()
     {
+        if (MakerManager.instance.isGameMaker)
+            return;
+
         bounds = spriteRenderer.bounds; // 박스의 바운드         
         // 플레이어가 센서에 닿았을 때
         if (Physics2D.OverlapBox(new Vector2(bounds.center.x, bounds.min.y + yOffset), seonsorSize, 0, playerLayer) && isBoxOn == false)

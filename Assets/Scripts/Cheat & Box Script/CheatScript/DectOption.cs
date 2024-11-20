@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,7 +8,7 @@ using UnityEngine;
 [ExecuteInEditMode]
 #endif
 
-public class DetectOption : MonoBehaviour
+public  class DetectOption : MonoBehaviour
 {
     public enum DetectType
     {
@@ -18,7 +19,7 @@ public class DetectOption : MonoBehaviour
     [Header("감지 옵션")]
     public DetectType dectType;
     [Header("감지 범위")]
-    public float y = 10f; // y축 길이    
+    public float detectionY = 10f; // y축 길이    
     public float xSize; // x축 길이
     [Header("X축 길이 감소비율")]
     [Range(0f, 1f)]
@@ -32,37 +33,46 @@ public class DetectOption : MonoBehaviour
     
     protected virtual void Update()
     {
+        if (MakerManager.instance.isGameMaker)
+            return;
+
         Detect();
     }
 
     // 감지 범위
     protected virtual void Detect()
     {
+        xSize = transform.localScale.x;
         // 위를 감지
         if (dectType == DetectType.Up)
         {
             // 감지 범위 중심으로 하게 하기 위해 
-            adaptPos = transform.position + new Vector3(0, y / 2, 0);
+            adaptPos = transform.position + new Vector3(0, detectionY / 2, 0);
             // 플레이어가 범위에서 감지되면
-            if (Physics2D.OverlapBox(adaptPos, new Vector2(xSize * xPercent, y), 0, playerLayer) && isDetected == false)
+            if (Physics2D.OverlapBox(adaptPos, new Vector2(xSize * xPercent, detectionY), 0, playerLayer) && isDetected == false)
             {
                 isDetectUp = true;
                 isDetected = true;
+                DetectTrigger_Up();
             }
         }
         // 아래를 감지
         else if (dectType == DetectType.Down)
         {
             // 감지 범위 중심으로 하게 하기 위해
-            adaptPos = transform.position + new Vector3(0, -y / 2, 0);
+            adaptPos = transform.position + new Vector3(0, -detectionY / 2, 0);
             // 플레이어가 범위에서 감지되면
-            if (Physics2D.OverlapBox(adaptPos, new Vector2(xSize * xPercent, y), 0, playerLayer) && isDetected == false)
+            if (Physics2D.OverlapBox(adaptPos, new Vector2(xSize * xPercent, detectionY), 0, playerLayer) && isDetected == false)
             {
                 isDetectDown = true;
                 isDetected = true;
+                DetectTrigger_Down();
             }
         }
     }
+
+    protected virtual void DetectTrigger_Up() { }
+    protected virtual void DetectTrigger_Down() { }    
 #if UNITY_EDITOR
     protected virtual void OnDrawGizmos()
     {
@@ -70,11 +80,11 @@ public class DetectOption : MonoBehaviour
         // 사각형의 높이를 아래쪽으로만 증가시키기 위해 중심을 아래로 이동
         if (dectType == DetectType.Up)
         {            
-            Gizmos.DrawWireCube(adaptPos, new Vector2(xSize * xPercent, y));
+            Gizmos.DrawWireCube(adaptPos, new Vector2(xSize * xPercent, detectionY));
         }
         else if (dectType == DetectType.Down)
         {            
-            Gizmos.DrawWireCube(adaptPos, new Vector2(xSize * xPercent, y));
+            Gizmos.DrawWireCube(adaptPos, new Vector2(xSize * xPercent, detectionY));
         }
     }
 #endif

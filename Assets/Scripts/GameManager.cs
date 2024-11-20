@@ -9,6 +9,8 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager instance;
+
     public int totalPoint;
     public int stagePoint;
     public int stageIndex;
@@ -20,9 +22,19 @@ public class GameManager : MonoBehaviour
     public AudioSource jumpSource;
     public AudioSource deathSource;
     public AudioSource clearSource;
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (MakerManager.instance.isGameMaker)
+            return;
+
         if (collision.CompareTag("Player"))
         {
             player.OnDie();
@@ -64,6 +76,9 @@ public class GameManager : MonoBehaviour
 
     public void SoundOn(string action)
     {
+        if (MakerManager.instance.isGameMaker)
+            return;
+
         switch (action)
         {
             case "jump":

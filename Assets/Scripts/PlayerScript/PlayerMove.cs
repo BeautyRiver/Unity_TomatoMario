@@ -14,7 +14,6 @@ public class PlayerMove : MonoBehaviour
 
     [Header("카메라 및 게임 관리")]
     public Camera playerCamera;
-    public GameManager gameManager;
 
     [Header("오디오")]
     public AudioClip audioJump;
@@ -77,29 +76,25 @@ public class PlayerMove : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
     }
 
-    private void Start()
+    public void InitPlayer()
     {
-        // 초기 설정
-        Init();
-    }
-
-    private void Init()
-    {
+        gameObject.SetActive(true);
         isDead = false;
+        boxCollider2D.enabled = true;
+        rb.gravityScale = 1;
         jumpPower = shortJumpForce;
         initialScale = transform.localScale;
         initPos = transform.position;
         float x = PlayerPrefs.GetFloat("SavePointX", transform.position.x);
-        float y = PlayerPrefs.GetFloat("SavePointY", transform.position.y);
-        float z = PlayerPrefs.GetFloat("SavePointZ", transform.position.z);
-        transform.position = new Vector3(x, y, z);
+        float y = PlayerPrefs.GetFloat("SavePointY", transform.position.y);        
+        transform.position = new Vector2(x, y);
         Camera.main.transform.position = new Vector3(transform.position.x, -1.7f, -10);
         life = PlayerPrefs.GetInt("PlayerLife", 3); // PlayerPrefs에서 life 값을 불러오기 
     }
 
     void Update()
     {
-        if (isDead)
+        if (isDead || MakerManager.instance.isGameMaker)
             return;
         
         PlayerKeyDown(); // 플레이어 키 입력
@@ -167,7 +162,7 @@ public class PlayerMove : MonoBehaviour
             longJumpTimer = 0f; // 타이머 초기화
             rb.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse); // 점프                   
             audioSource.clip = audioJump; // 오디오 클립 설정
-            gameManager.SoundOn("jump"); // 점프 사운드
+            GameManager.instance.SoundOn("jump"); // 점프 사운드
 
             // 이벤트 호출
             OnPlayerJumped?.Invoke(jumpPower);
@@ -188,17 +183,24 @@ public class PlayerMove : MonoBehaviour
     // Head 센서 컨트롤
     private void HeadSensorControll()
     {
-        if (rb.velocity.y < 0f)
-            headSensor.SetActive(false); // 머리 센서 비활성화
-        else if (rb.velocity.y > 0f)
-            headSensor.SetActive(true); // 머리 센서 활성화
+        // 현재 jump anmation이 실행중이면
+        if (animator.GetBool("isJumping"))
+        {
+            // 머리 센서 활성화
+            headSensor.SetActive(true);
+        }
+        else
+        {
+            // 머리 센서 비활성화
+            headSensor.SetActive(false);
+        }
     }
 
 
     // 카메라의 왼쪽이상으로 이동못하게
     private void CanMovePos()
     {
-        Vector3 screenPoint = playerCamera.WorldToViewportPoint(transform.position);
+        Vector3 screenPoint = Camera.main.WorldToViewportPoint(transform.position);
 
         if (screenPoint.x < 0f)
             screenPoint.x = 0f;
@@ -225,7 +227,7 @@ public class PlayerMove : MonoBehaviour
         rb.AddForce(Vector2.up * shortJumpForce, ForceMode2D.Impulse);
 
         //점수증가
-        gameManager.stagePoint += 100;
+        GameManager.instance.stagePoint += 100;
     }
 
     //Player 사망
@@ -243,7 +245,7 @@ public class PlayerMove : MonoBehaviour
         life--;
         PlayerPrefs.SetInt("PlayerLife", life); // life 값을 PlayerPrefs에 저장합니다.
         PlayerPrefs.Save();
-        gameManager.SoundOn("death");
+        GameManager.instance.SoundOn("death");
 
         StartCoroutine(DieMotion());
 
@@ -290,11 +292,10 @@ public class PlayerMove : MonoBehaviour
     //죽을때 마리오처럼 죽게하는 모션 코루틴
     IEnumerator DieMotion()
     {
-        float speed = 8;
+        boxCollider2D.enabled = false;
         animator.SetTrigger("doDying");
         yield return new WaitForSeconds(0.3f);
-        rb.gravityScale = 1;
-        rb.AddForce(Vector2.up * speed, ForceMode2D.Impulse);
+        rb.AddForce(Vector2.up * longJumpForce, ForceMode2D.Impulse);
         yield return new WaitForSeconds(0.7f);
         rb.gravityScale = 8;
         //Sprite 삭제
@@ -306,7 +307,7 @@ public class PlayerMove : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
         //gameObject.SetActive(false);
-        gameManager.DeathSceneOn(); // 데쓰씬 키기
+        GameManager.instance.DeathSceneOn(); // 데쓰씬 키기
     }
 
     // 토관 들어가는 모션

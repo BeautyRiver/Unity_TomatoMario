@@ -28,6 +28,9 @@ public class Shooting : MonoBehaviour
     }
     private void Update() 
     {
+        if (MakerManager.instance.isGameMaker)
+            return;
+
         if (transform.position.y > 10f)
         {
             Destroy(gameObject);            

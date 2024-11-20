@@ -127,7 +127,7 @@ GameObject:
   - component: {fileID: 6724779887954284133}
   - component: {fileID: 6724779887954284132}
   - component: {fileID: 6724779887954284138}
-  - component: {fileID: -4639717528928380142}
+  - component: {fileID: 4661253187906548656}
   m_Layer: 0
   m_Name: Platform_Fall (Ground)
   m_TagString: Untagged
@@ -207,7 +207,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 5
---- !u!114 &-4639717528928380142
+--- !u!114 &4661253187906548656
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -216,12 +216,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 6724779887954284134}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14c7f91f7d4d0cf4cba7ae218f3b2434, type: 3}
+  m_Script: {fileID: 11500000, guid: 143b70aab133fc444b6db2db7b4a7bf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   dectType: 0
-  y: 10
-  xSize: 3
+  detectionY: 10
+  xSize: 0
   xPercent: 1
   isDetected: 0
   isDetectUp: 0
@@ -229,7 +229,7 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 256
-  blockCount: 3
+  blockCount: 0
 --- !u!1 &8288801873904702077
 GameObject:
   m_ObjectHideFlags: 0

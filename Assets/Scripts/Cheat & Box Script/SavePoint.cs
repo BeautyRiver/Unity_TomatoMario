@@ -8,6 +8,9 @@ public class SavePoint : MonoBehaviour
     bool isSaved = false;
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (MakerManager.instance.isGameMaker)
+            return;
+
         if (!other.CompareTag("Player") || isSaved == true)
             return;
         

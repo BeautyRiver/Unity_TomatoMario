@@ -358,8 +358,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3338445843825178909}
   - component: {fileID: 3338445843825178908}
-  - component: {fileID: 3338445843825178911}
   - component: {fileID: 3338445843825178898}
+  - component: {fileID: -5743446274595455091}
   m_Layer: 0
   m_Name: Platform_Fall(Block)
   m_TagString: Untagged
@@ -416,29 +416,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &3338445843825178911
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3338445843825178910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14c7f91f7d4d0cf4cba7ae218f3b2434, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dectType: 1
-  y: 10
-  xSize: 3
-  xPercent: 1
-  isDetected: 0
-  isDetectUp: 0
-  isDetectDown: 0
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  blockCount: 3
 --- !u!50 &3338445843825178898
 Rigidbody2D:
   serializedVersion: 4
@@ -460,3 +437,26 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 5
+--- !u!114 &-5743446274595455091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3338445843825178910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 143b70aab133fc444b6db2db7b4a7bf5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dectType: 0
+  detectionY: 10
+  xSize: 0
+  xPercent: 1
+  isDetected: 0
+  isDetectUp: 0
+  isDetectDown: 0
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  blockCount: 0

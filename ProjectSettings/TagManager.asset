@@ -20,6 +20,7 @@ TagManager:
   - DeadEnemy
   - Cloud
   - Pipe
+  - Block
   layers:
   - Default
   - TransparentFX
@@ -35,7 +36,7 @@ TagManager:
   - Player_Head
   - Enemy
   - EnemyHitBox
-  - 
+  - DropPlatform
   - 
   - 
   - 

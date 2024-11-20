@@ -6,6 +6,9 @@ public class GreenHole_Shot : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (MakerManager.instance.isGameMaker)
+            return;
+
         if (other.CompareTag("Player"))
         {
             Debug.Log("플레이어와 충돌");

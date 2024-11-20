@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TreeEditor;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.Tilemaps;
 
 public class PlayerCollision : MonoBehaviour
 {
@@ -16,6 +17,9 @@ public class PlayerCollision : MonoBehaviour
     #region Collision, Trigger 관련        
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (MakerManager.instance.isGameMaker)
+            return;
+
         GameObject obj = collision.gameObject;
         // Enemy의 머리를 감지했을때
         if (gameObject.CompareTag("Player") && obj.tag == "EnemyHitBox")
@@ -24,14 +28,13 @@ public class PlayerCollision : MonoBehaviour
             {
                 playerMove.OnAttack(collision.gameObject);
             }
-            else
-            {
-                playerMove.OnDie();
-            }
         }
+
         // 함정 or Enemy와 충돌시 사망
         if (gameObject.CompareTag("Player") && obj.tag == "Enemy" || obj.CompareTag("Spike"))
         {
+            if (playerMove.isBig)
+                return;
             playerMove.OnDie();
             Debug.Log("몬스터 충돌");
         }
@@ -39,17 +42,51 @@ public class PlayerCollision : MonoBehaviour
         if (obj.tag == "Item")
         {
             Destroy(collision.gameObject);
-            transform.DOScale(Vector3.one * 15f, 3f).SetEase(Ease.OutBack).OnComplete(() => playerMove.OnDie());
+            //transform.DOScale(Vector3.one * 20f, 1.5f).SetEase(Ease.Linear);
+            transform.DOScale(Vector3.one * 20f, 1.5f).SetEase(Ease.Linear).OnComplete(() => playerMove.OnDie());
             playerMove.isBig = true;
-        }      
+        }
     }
-    private void OnTriggerStay2D(Collider2D collision)
+
+    private void OnCollisionStay2D(Collision2D collision)
     {
-        
+        if (MakerManager.instance.isGameMaker)
+            return;
+
+        if (!playerMove.isBig)
+            return;
+
+        // 충돌한 오브젝트가 타일맵인지 확인
+        if (collision.gameObject.TryGetComponent<Tilemap>(out Tilemap tilemap))
+        {
+            foreach (ContactPoint2D contact in collision.contacts)
+            {
+                // 충돌 지점의 월드 좌표 가져오기
+                Vector3 contactPosition = contact.point;
+
+                // 타일맵의 위치로 변환
+                Vector3Int cellPosition = tilemap.WorldToCell(contactPosition);
+
+                // 해당 위치의 타일을 제거
+                if (tilemap.HasTile(cellPosition))
+                {
+                    tilemap.SetTile(cellPosition, null);
+                    Debug.Log($"타일 제거: {cellPosition}");
+                }
+            }
+        }
+        else
+        {
+            collision.gameObject.SetActive(false);
+        }
     }
+
 
     private void OnTriggerEnter2D(Collider2D other) 
     {
+        if (MakerManager.instance.isGameMaker)
+            return;
+
         if (other.CompareTag("Enemy") || other.CompareTag("Spike"))
         {
             playerMove.OnDie();

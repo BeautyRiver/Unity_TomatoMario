@@ -179,8 +179,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6db23334c2e89de41a220d6dea085764, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  yOffset: 0
-  seonsorSize: {x: 1, y: 0.15}
+  yOffset: 0.2
+  seonsorSize: {x: 1, y: 0.54}
   playerLayer:
     serializedVersion: 2
     m_Bits: 2048
@@ -707,7 +707,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7458799151577682760
 Transform:
   m_ObjectHideFlags: 0

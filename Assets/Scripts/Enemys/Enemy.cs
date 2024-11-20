@@ -1,10 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-#if UNITY_EDITOR
-[ExecuteInEditMode]  //<- 이 부분이 에디터에서 작동되도록 선언하는 부분
-#endif
-
 public class Enemy : MonoBehaviour
 {       
     [Header("몬스터의 기본 속성")]
