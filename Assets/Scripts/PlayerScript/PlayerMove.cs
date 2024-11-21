@@ -307,7 +307,7 @@ public class PlayerMove : MonoBehaviour
         boxCollider2D.enabled = false;
         animator.SetTrigger("doDying");
         yield return new WaitForSeconds(0.3f);
-        rb.AddForce(Vector2.up * longJumpForce, ForceMode2D.Impulse);
+        rb.AddForce(Vector2.up * shortJumpForce, ForceMode2D.Impulse);
         yield return new WaitForSeconds(0.7f);
         rb.gravityScale = 8;
         //Sprite 삭제

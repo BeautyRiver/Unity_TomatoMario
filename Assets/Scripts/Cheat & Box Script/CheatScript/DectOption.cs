@@ -4,9 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 
-#if UNITY_EDITOR
-[ExecuteInEditMode]
-#endif
 
 public  class DetectOption : MonoBehaviour
 {

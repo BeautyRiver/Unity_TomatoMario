@@ -19,7 +19,8 @@ public class PlayerCollision : MonoBehaviour
     {
         if (MakerManager.instance.isGameMaker)
             return;
-
+        if (playerMove.isDead)
+            return;
         GameObject obj = collision.gameObject;
         // Enemy의 머리를 감지했을때
         if (gameObject.CompareTag("Player") && obj.tag == "EnemyHitBox")
@@ -51,6 +52,9 @@ public class PlayerCollision : MonoBehaviour
     private void OnCollisionStay2D(Collision2D collision)
     {
         if (MakerManager.instance.isGameMaker)
+            return;
+
+        if (playerMove.isDead)
             return;
 
         if (!playerMove.isBig)
@@ -85,6 +89,9 @@ public class PlayerCollision : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other) 
     {
         if (MakerManager.instance.isGameMaker)
+            return;
+
+        if (playerMove.isDead)
             return;
 
         if (other.CompareTag("Enemy") || other.CompareTag("Spike"))

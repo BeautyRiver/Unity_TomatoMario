@@ -449,7 +449,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 143b70aab133fc444b6db2db7b4a7bf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dectType: 0
+  dectType: 1
   detectionY: 10
   xSize: 0
   xPercent: 1

@@ -11,8 +11,10 @@ public class MakerManager : MonoBehaviour
     public bool isTileSet = true;
     public int itemIndex = 0;
     public Text infoText;
+
     public GameObject itemList;
     public GameObject batchMouse; // 배치할 마우스
+    public GameObject spriteChanger; // 타일 변경 버튼
     public Transform selector; // 선택된 아이템을 표시할 이미지
 
 
@@ -74,18 +76,20 @@ public class MakerManager : MonoBehaviour
         isGameMaker = !isGameMaker;
         if (isGameMaker)
         {
-            infoText.text = "F5를 누르면 게임을 플레이 해볼 수 있어요!";
+            infoText.text = "F5를 누르면 [게임을 플레이] 해볼 수 있어요!";
             itemList.SetActive(true);
             GameManager.instance.player.MakerMode();
             batchMouse.SetActive(true);
+            spriteChanger.SetActive(true);
         }
         else
         {
-            infoText.text = "F5를 누르면 다시 게임을 만들 수 있어요!";
+            infoText.text = "F5를 누르면 [게임을 제작] 할 수 있어요!";
             itemList.SetActive(false);
             PlayerPrefs.DeleteAll();
             GameManager.instance.player.InitPlayer();
             batchMouse.SetActive(false);
+            spriteChanger.SetActive(false);
         }
     }
 
