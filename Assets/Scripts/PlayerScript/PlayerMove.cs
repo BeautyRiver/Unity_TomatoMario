@@ -76,6 +76,10 @@ public class PlayerMove : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
     }
 
+    private void Start()
+    {
+        InitPlayer();
+    }
     public void InitPlayer()
     {
         gameObject.SetActive(true);
@@ -86,7 +90,9 @@ public class PlayerMove : MonoBehaviour
         initialScale = transform.localScale;
         initPos = transform.position;
         float x = PlayerPrefs.GetFloat("SavePointX", transform.position.x);
-        float y = PlayerPrefs.GetFloat("SavePointY", transform.position.y);        
+        float y = PlayerPrefs.GetFloat("SavePointY", transform.position.y);
+        Debug.Log("Start Point: " + x + ", " + y);
+
         transform.position = new Vector2(x, y);
         Camera.main.transform.position = new Vector3(transform.position.x, -1.7f, -10);
         life = PlayerPrefs.GetInt("PlayerLife", 3); // PlayerPrefs에서 life 값을 불러오기 

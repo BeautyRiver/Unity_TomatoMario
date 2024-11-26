@@ -100,7 +100,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dectType: 0
-  detectionY: 10
+  detectionY: 30
   xSize: 1.63
   xPercent: 0.794
   isDetected: 0

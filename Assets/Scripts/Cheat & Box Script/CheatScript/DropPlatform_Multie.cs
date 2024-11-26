@@ -75,12 +75,14 @@ public class DropPlatform_Multie : DetectOption
             }
         }
     }
+#if UNITY_EDITOR
     protected override void OnDrawGizmos()
     {
         base.OnDrawGizmos();
         SetRectTransfrom();
     }
 
+#endif
     private void SetRectTransfrom()
     {
         // 자식 블록 개수 세기

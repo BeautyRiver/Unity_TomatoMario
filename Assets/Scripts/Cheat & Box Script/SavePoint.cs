@@ -19,9 +19,9 @@ public class SavePoint : MonoBehaviour
         if (!other.CompareTag("Player") || isSaved == true)
             return;
         
-        PlayerPrefs.SetFloat("SavePointX", transform.position.x);
-        PlayerPrefs.SetFloat("SavePointY", transform.position.y);
-        PlayerPrefs.SetFloat("SavePointZ", transform.position.z);
+        PlayerPrefs.SetFloat("SavePointX", other.transform.position.x);
+        PlayerPrefs.SetFloat("SavePointY", other.transform.position.y);
+        Debug.Log("Save Point: " + other.transform.position.x + ", " + other.transform.position.y);
         animator.SetTrigger("doSave");
         isSaved = true;
     }

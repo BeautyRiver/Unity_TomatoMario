@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 558557741648992534}
   - component: {fileID: 558557741648992533}
-  - component: {fileID: 558557741648992532}
   - component: {fileID: 7198028686311882443}
   m_Layer: 6
   m_Name: GreenPipe
@@ -86,28 +85,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &558557741648992532
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 558557741648992535}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cac0be9c291f3e147be684e65f430acd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dectType: 0
-  detectionY: 10
-  xSize: 1.63
-  xPercent: 0.794
-  isDetected: 0
-  isDetectUp: 0
-  isDetectDown: 0
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 256
 --- !u!61 &7198028686311882443
 BoxCollider2D:
   m_ObjectHideFlags: 0
