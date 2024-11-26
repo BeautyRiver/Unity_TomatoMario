@@ -21,6 +21,7 @@ TagManager:
   - Cloud
   - Pipe
   - Block
+  - ClearScene
   layers:
   - Default
   - TransparentFX

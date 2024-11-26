@@ -180,7 +180,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: world_tileset_transparent_3
+      name: "\uD22C\uBA85\uBA85"
       rect:
         serializedVersion: 2
         x: 48
@@ -2843,7 +2843,6 @@ TextureImporter:
       world_tileset_transparent_26: 1461310086
       world_tileset_transparent_28: 1868569274
       world_tileset_transparent_29: -509650495
-      world_tileset_transparent_3: -372123698
       world_tileset_transparent_30: 1861570336
       world_tileset_transparent_31: 1498808487
       world_tileset_transparent_32: -477696204
@@ -2920,6 +2919,7 @@ TextureImporter:
       world_tileset_transparent_97: -1961751988
       world_tileset_transparent_98: -780081093
       world_tileset_transparent_99: 1473750659
+      "\uD22C\uBA85\uBA85": -372123698
       "\uD22C\uBA85\uC0C1\uC790": 663208437
   spritePackingTag: 
   pSDRemoveMatte: 0

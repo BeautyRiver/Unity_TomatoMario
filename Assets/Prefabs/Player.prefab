@@ -359,7 +359,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 0}
-  gameManager: {fileID: 0}
   audioJump: {fileID: 8300000, guid: 2c5292ba5cf254919a6b9e2b18e04f49, type: 3}
   life: -18
   maxSpeed: 5.7
@@ -384,8 +383,8 @@ MonoBehaviour:
   isBig: 0
   isDownKey: 0
   headSensor: {fileID: 5898244810471578272}
-  groundCheckBoxSize: {x: 0.73, y: 0.12}
-  enemyCheckBoxSize: {x: 0.61, y: 2}
+  groundCheckBoxSize: {x: 0.45, y: 0.12}
+  enemyCheckBoxSize: {x: 0.73, y: 0.41}
   footPosition: {x: 102.6, y: -7.3999996}
   refVelocity: 0
   slideRate: 0.14

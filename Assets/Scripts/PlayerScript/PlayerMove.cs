@@ -84,6 +84,7 @@ public class PlayerMove : MonoBehaviour
     {
         gameObject.SetActive(true);
         isDead = false;
+        isBig = false;
         boxCollider2D.enabled = true;
         rb.gravityScale = 1;
         jumpPower = shortJumpForce;
@@ -96,6 +97,7 @@ public class PlayerMove : MonoBehaviour
         transform.position = new Vector2(x, y);
         Camera.main.transform.position = new Vector3(transform.position.x, -1.7f, -10);
         life = PlayerPrefs.GetInt("PlayerLife", 3); // PlayerPrefs에서 life 값을 불러오기 
+        TransparentBox.OnInitEvent(); // 투명 박스 투명하게
     }
 
     public void MakerMode()
@@ -111,7 +113,10 @@ public class PlayerMove : MonoBehaviour
 
         if (isDead)
             return;
-        
+
+        if (GameManager.instance.isPaused)
+            return;
+
         PlayerKeyDown(); // 플레이어 키 입력
         PlayerAnmation(); // 플레이어 애니메이션
         CanMovePos(); // 카메라의 왼쪽이상으로 이동못하게        
@@ -127,7 +132,10 @@ public class PlayerMove : MonoBehaviour
 
         if (isDead)
             return;
-        
+
+        if (GameManager.instance.isPaused)
+            return;
+
         PlayerMoveMent(); // 플레이어 이동
         HeadSensorControll(); // 머리 센서 컨트롤
     }
@@ -313,7 +321,7 @@ public class PlayerMove : MonoBehaviour
         boxCollider2D.enabled = false;
         animator.SetTrigger("doDying");
         yield return new WaitForSeconds(0.3f);
-        rb.AddForce(Vector2.up * shortJumpForce, ForceMode2D.Impulse);
+        rb.AddForce(Vector2.up * shortJumpForce * 0.5f, ForceMode2D.Impulse);
         yield return new WaitForSeconds(0.7f);
         rb.gravityScale = 8;
         //Sprite 삭제

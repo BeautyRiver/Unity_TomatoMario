@@ -10,15 +10,15 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
-
     public int totalPoint;
     public int stagePoint;
     public int stageIndex;
     public int player_health;
+    public bool isPaused = false;
     public Image deathScene;
     public PlayerMove player;
     public TextMeshProUGUI lifeText;
-
+    public GameObject uiOption;
     public AudioSource jumpSource;
     public AudioSource deathSource;
     public AudioSource clearSource;
@@ -30,6 +30,43 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            ToggleUIOption();
+    }
+
+    public void ToggleUIOption()
+    {
+        if (!uiOption.activeSelf)
+        {
+            uiOption.SetActive(true);
+            Stop();
+        }
+        else
+        {
+            uiOption.SetActive(false);
+            Resume();
+        }
+    }
+
+    public void Stop()
+    {
+        isPaused = true;
+        Time.timeScale = 0f;
+    }
+
+    public void Resume()
+    {
+        isPaused = false;
+        Time.timeScale = 1f;
+    }
+    
+    public void GoTitle()
+    {
+        Resume();
+        SceneManager.LoadScene("Title Scene");
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (MakerManager.instance.isGameMaker)
@@ -49,7 +86,6 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1;
         SceneManager.LoadScene(0);
     }
-
     public void DeathSceneOn()
     {
         deathScene.gameObject.SetActive(true);
@@ -73,7 +109,6 @@ public class GameManager : MonoBehaviour
         player.life = PlayerPrefs.GetInt("PlayerLife", 3); // PlayerPrefs에서 life 값을 불러오기 
         SceneManager.LoadScene(0);
     }
-
     public void SoundOn(string action)
     {
         if (MakerManager.instance.isGameMaker)

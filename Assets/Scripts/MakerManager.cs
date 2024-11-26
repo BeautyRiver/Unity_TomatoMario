@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,8 +18,6 @@ public class MakerManager : MonoBehaviour
     public GameObject spriteChanger; // 타일 변경 버튼
     public Transform selector; // 선택된 아이템을 표시할 이미지
 
-
-
     public float moveSpeed = 5f; // 카메라 이동 속도
     public float smoothTime = 0.3f; // 부드럽게 이동하는 시간
     private Vector3 velocity = Vector3.zero; // SmoothDamp에서 사용되는 속도 저장값
@@ -35,6 +34,10 @@ public class MakerManager : MonoBehaviour
         ToggleGameStateOnKeyPress(); // 게임 상태 전환
         if (!isGameMaker)
             return;
+
+        if (GameManager.instance.isPaused)
+            return;
+
         UpdateItemIndex(); // 아이템 인덱스 업데이트
         CameraMoveControll(); // 카메라 이동
     }
@@ -47,9 +50,7 @@ public class MakerManager : MonoBehaviour
         {
             PlayerPrefs.DeleteAll();
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-
-        
+        }        
     }
 
     private void UpdateItemIndex()
@@ -61,6 +62,12 @@ public class MakerManager : MonoBehaviour
                 itemIndex = i;
                 selector.position = itemList.transform.GetChild(i - 1).position;
                 break; // 숫자 입력이 처리되면 반복문 종료
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha0))
+            {
+                itemIndex = 10;
+                selector.position = itemList.transform.GetChild(9).position;
+                break;
             }
         }
     }
@@ -76,6 +83,8 @@ public class MakerManager : MonoBehaviour
 
         // SmoothDamp를 사용하여 부드럽게 이동
         Camera.main.transform.position = Vector3.SmoothDamp(currentPosition, targetPosition, ref velocity, smoothTime);
+        // 카메라 최대 이동 제한
+        Camera.main.transform.position = new Vector3(Mathf.Clamp(Camera.main.transform.position.x, -50f,  190f), Mathf.Clamp(Camera.main.transform.position.y, -3.5f, 3.5f), -7f);
     }
 
     public void GameState()

@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Box : MonoBehaviour
 {
+    public static Action OnInitEvent;
+
     [Header("센서")]
     public float yOffset = 0f; // 센서 위치    
     public Vector2 seonsorSize = new Vector2(1, 1); // 센서 크기

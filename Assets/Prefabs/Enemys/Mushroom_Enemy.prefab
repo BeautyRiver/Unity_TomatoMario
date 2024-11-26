@@ -153,12 +153,13 @@ MonoBehaviour:
   isHit: 0
   isGround: 1
   canAtk: 1
-  MonsterDirRight: 0
+  dir: -1
   hitBoxCollider: {fileID: 2437447438464790111}
   anim: {fileID: 0}
   layerMask:
     serializedVersion: 2
     m_Bits: 64
+  distance: 0
   wallCheck:
   - {fileID: 2437447437755979070}
   - {fileID: 2437447437442134454}

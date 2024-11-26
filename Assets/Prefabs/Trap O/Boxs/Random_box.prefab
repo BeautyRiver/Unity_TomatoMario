@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   yOffset: 0.2
-  seonsorSize: {x: 1, y: 0.54}
+  seonsorSize: {x: 1, y: 0.4}
   playerLayer:
     serializedVersion: 2
     m_Bits: 2048

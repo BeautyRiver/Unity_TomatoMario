@@ -20,9 +20,8 @@ public class PlayerCollision : MonoBehaviour
             return;
         if (playerMove.isDead)
             return;
-        GameObject obj = collision.gameObject;
         // Enemy의 머리를 감지했을때
-        if (gameObject.CompareTag("Player") && obj.tag == "EnemyHitBox")
+        if (gameObject.CompareTag("Player") && collision.gameObject.tag == "EnemyHitBox")
         {
             if (playerMove.canKillEnemy) // Enemy 머리를 발 밑에 두고있으면 죽일 수 있음
             {
@@ -31,7 +30,7 @@ public class PlayerCollision : MonoBehaviour
         }
 
         // 함정 or Enemy와 충돌시 사망
-        if (gameObject.CompareTag("Player") && obj.tag == "Enemy" || obj.CompareTag("Spike"))
+        if (gameObject.CompareTag("Player") && collision.gameObject.tag == "Enemy" || collision.gameObject.CompareTag("Spike"))
         {
             if (playerMove.isBig)
                 return;
@@ -39,7 +38,7 @@ public class PlayerCollision : MonoBehaviour
             Debug.Log("몬스터 충돌");
         }
 
-        if (obj.tag == "Item")
+        if (collision.gameObject.tag == "Item")
         {
             Destroy(collision.gameObject);
             //transform.DOScale(Vector3.one * 20f, 1.5f).SetEase(Ease.Linear);

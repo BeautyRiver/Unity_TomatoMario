@@ -20,6 +20,9 @@ public class MouseSelector : MonoBehaviour
         if (!MakerManager.instance.isGameMaker) // 게임 메이커 모드가 아니면 동작 안함
             return;
 
+        if (GameManager.instance.isPaused) // 일시정지 상태면 동작 안함
+            return;
+
         // 마우스 위치 계산
         mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         cellPosition = tilemap.WorldToCell(mousePos);

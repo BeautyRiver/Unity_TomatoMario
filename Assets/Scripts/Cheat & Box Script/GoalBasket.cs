@@ -13,8 +13,10 @@ public class GoalBasket : MonoBehaviour
     private Image clearImage;
     private TextMeshProUGUI clearText;
     public PlayerMove playerMove;
-    private void Awake()
+    private void Start()
     {
+        clearScene = GameObject.FindWithTag("ClearScene"); 
+        playerMove = GameManager.instance.player;
         clearImage = clearScene.GetComponentInChildren<Image>();
         clearText = clearScene.GetComponentInChildren<TextMeshProUGUI>();
     }
@@ -41,6 +43,6 @@ public class GoalBasket : MonoBehaviour
     IEnumerator goToTitle()
     {
         yield return new WaitForSeconds(2);
-        SceneManager.LoadScene("Title");
+        SceneManager.LoadScene("Title Scene");
     }
 }
