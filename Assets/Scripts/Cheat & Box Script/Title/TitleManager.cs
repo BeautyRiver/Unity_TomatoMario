@@ -83,6 +83,7 @@ public class TitleManager : MonoBehaviour
     public void GameStart()
     {
         SceneManager.LoadScene(idx + 1);
+        PlayerPrefs.DeleteAll();
     }
 
     // 게임 종료
