@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ItemMove : MonoBehaviour
 {
-    public float speed;
+    public float moveSpeed;
     public Transform wallCheck;
     public LayerMask platformLayer;
     private int dir = 1;
@@ -21,7 +21,7 @@ public class ItemMove : MonoBehaviour
         if (MakerManager.instance.isGameMaker)
             return;
 
-        rb.MovePosition(rb.position + new Vector2(transform.localScale.x * speed * Time.deltaTime, 0));
+        rb.velocity = new Vector2(transform.localScale.x * moveSpeed, rb.velocity.y); // 이동
 
         if (Physics2D.OverlapCircle(wallCheck.position, 0.01f, platformLayer))
         {

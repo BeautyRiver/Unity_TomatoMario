@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class SavePoint : MonoBehaviour
 {
-    public Sprite changeSprite;
-    bool isSaved = false;
+    [SerializeField] private bool isSaved = false;
+    private Animator animator;
+
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+    }
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (MakerManager.instance.isGameMaker)
@@ -17,8 +22,7 @@ public class SavePoint : MonoBehaviour
         PlayerPrefs.SetFloat("SavePointX", transform.position.x);
         PlayerPrefs.SetFloat("SavePointY", transform.position.y);
         PlayerPrefs.SetFloat("SavePointZ", transform.position.z);
-
-        gameObject.GetComponentInParent<SpriteRenderer>().sprite = changeSprite;
+        animator.SetTrigger("doSave");
         isSaved = true;
     }
 }

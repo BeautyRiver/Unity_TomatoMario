@@ -9,7 +9,7 @@ public class MakerManager : MonoBehaviour
     public static MakerManager instance;
     public bool isGameMaker;
     public bool isTileSet = true;
-    public int itemIndex = 0;
+    public int itemIndex = 1;
     public Text infoText;
 
     public GameObject itemList;
@@ -32,11 +32,11 @@ public class MakerManager : MonoBehaviour
     }
     private void Update()
     {
-        ToggleGameStateOnKeyPress();
+        ToggleGameStateOnKeyPress(); // 게임 상태 전환
         if (!isGameMaker)
             return;
-
-        CameraMoveControll();
+        UpdateItemIndex(); // 아이템 인덱스 업데이트
+        CameraMoveControll(); // 카메라 이동
     }
 
     private void ToggleGameStateOnKeyPress()
@@ -44,8 +44,16 @@ public class MakerManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F5))
             GameState();
         if (Input.GetKeyDown(KeyCode.F6))
+        {
+            PlayerPrefs.DeleteAll();
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
 
+        
+    }
+
+    private void UpdateItemIndex()
+    {
         for (int i = 1; i <= 9; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha0 + i)) // 숫자 키 입력 확인
@@ -56,7 +64,6 @@ public class MakerManager : MonoBehaviour
             }
         }
     }
-
     private void CameraMoveControll()
     {
         float x = Input.GetAxis("Horizontal");
@@ -65,7 +72,7 @@ public class MakerManager : MonoBehaviour
         Vector3 currentPosition = Camera.main.transform.position;
 
         // 목표 위치 계산
-        Vector3 targetPosition = currentPosition + new Vector3(x, y, 0) * moveSpeed * Time.deltaTime;
+        Vector3 targetPosition = currentPosition + new Vector3(x, y, 0) * moveSpeed * Time.fixedDeltaTime;
 
         // SmoothDamp를 사용하여 부드럽게 이동
         Camera.main.transform.position = Vector3.SmoothDamp(currentPosition, targetPosition, ref velocity, smoothTime);

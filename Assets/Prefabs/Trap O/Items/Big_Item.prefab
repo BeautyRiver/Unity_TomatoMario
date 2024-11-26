@@ -133,7 +133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea19f6c22ac2f7541aac12be5a60304b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2
+  moveSpeed: 2
   wallCheck: {fileID: 6853852850271810830}
   platformLayer:
     serializedVersion: 2

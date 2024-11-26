@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7881588631850549818}
   - component: {fileID: 7881588631850549819}
-  - component: {fileID: 7881588631850549820}
   - component: {fileID: 7881588631850549817}
   - component: {fileID: 1437256284}
+  - component: {fileID: 6268269786621253263}
   m_Layer: 0
   m_Name: SavePoint
   m_TagString: CheckPoint
@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: -1684670042, guid: bb4b5af5b73e5d746a5b1bf4c6b42134, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 68f54e5fc0fa326458d3e18bdccce704, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -87,20 +87,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7881588631850549820
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7881588631850549821}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ee499d2ee1bff2409b7463da79fbb2c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  checkPointSaveNo: {fileID: -1684670042, guid: bb4b5af5b73e5d746a5b1bf4c6b42134, type: 3}
-  checkPointSaveOk: {fileID: -532835293, guid: bb4b5af5b73e5d746a5b1bf4c6b42134, type: 3}
 --- !u!61 &7881588631850549817
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -111,21 +97,21 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 2}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.43, y: 2.55}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 4, y: 4}
     newSize: {x: 1.43, y: 2.55}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.43, y: 2.55}
+  m_Size: {x: 4, y: 4}
   m_EdgeRadius: 0
 --- !u!50 &1437256284
 Rigidbody2D:
@@ -148,3 +134,16 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &6268269786621253263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7881588631850549821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bd757ba07c2c134188f4c92b3bd2de8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  changeSprite: {fileID: 0}
